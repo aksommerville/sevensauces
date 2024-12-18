@@ -2,6 +2,21 @@
 
 Requires [Egg](https://github.com/aksommerville/egg) to build.
 
+## TODO
+
+- [ ] Finish onboarding sprites copied from 20241217
+- - [ ] Harvest
+- - [x] "drop" and "free" usages for hero.
+- [ ] Fauna parameters.
+- [ ] Sort sprites before render
+- [ ] Doors
+- [ ] Transient entities
+- [ ] Shops: Add a stationer, in addition to the ones from 20241217
+- [ ] Condensery
+- [ ] Kitchen
+
+## Notes re starting over
+
 Second attempt. The first is sevensauces-20241217, I've kept it for reference.
 
 Key differences from first attempt:
@@ -53,6 +68,12 @@ Customers:
 - Elf: Satisfied if veg>meat. Ecstatic if all veg are different.
 - Leprechaun: Satisfied if candy present. Ecstatic if candy>veg and candy>meat.
 - Werewolf: Satisfied if anything present. Ecstatic if portions exceed population.
+
+A consequence of this approach is that all customers of a given class will react the same way every time.
+Is that desirable?
+I think so. The game has to be playable, right? So the player can look at her cauldron and customers and predict the outcome exactly.
+
+^ Dissatisfied customers should appear in the field the next day, and you can give them an Apology Card to bring them back, one at a time.
 
 Ingredients go up to 25 servings, and the cauldron holds 15, so we have a capacity of 375.
 Start with 4 customers, one of each race.

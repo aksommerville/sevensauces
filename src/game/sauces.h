@@ -25,10 +25,25 @@ extern struct g {
   struct font *font;
   struct layer **layerv;
   int layerc,layera;
+  struct layer *layer_focus; // OPTIONAL, WEAK.
   struct session *session; // OPTIONAL. Absent at Hello.
   struct world *world; // OPTIONAL. Present only during the diurnal phase.
   struct kitchen *kitchen; // OPTIONAL. Present only during the nocturnal phase.
   int pvinput;
 } g;
+
+int sauces_res_get(void *dstpp,int tid,int rid);
+
+/* Recreates (g.session) and pushes the appropriate layer.
+ */
+int sauces_begin_session();
+
+void sauces_end_session();
+
+/* Pops the world layer, creates the kitchen model, and pushes a kitchen layer.
+ */
+int sauces_end_day();
+
+int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid);
 
 #endif

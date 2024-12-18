@@ -3,7 +3,7 @@
 #include "menu.h"
 
 // It takes a fixed amount of time to move the cursor, regardless of how far it's moving.
-#define CURSOR_RATE 5.0 /* Hz, ie 1/s */
+#define CURSOR_RATE 8.0 /* Hz, ie 1/s */
 
 /* Delete.
  */
@@ -55,10 +55,22 @@ static void menu_get_cursor(int *x,int *y,int *w,int *h,const struct menu *menu)
   }
 }
 
+/* Terminate animation and reset focus bounds.
+ */
+
+void menu_force_focus_bounds(struct menu *menu) {
+  if (!menu->focus.widget) return;
+  menu->focus.t=1.0;
+  menu->focus.x1=menu->focus.widget->x;
+  menu->focus.y1=menu->focus.widget->y;
+  menu->focus.w1=menu->focus.widget->w;
+  menu->focus.h1=menu->focus.widget->h;
+}
+
 /* Set focus.
  */
  
-static void menu_set_focus(struct menu *menu,struct widget *widget) {
+void menu_set_focus(struct menu *menu,struct widget *widget) {
   if (widget==menu->focus.widget) return;
   if (menu->focus.widget&&menu->focus.widget->type->focus) {
     menu->focus.widget->type->focus(widget,0);

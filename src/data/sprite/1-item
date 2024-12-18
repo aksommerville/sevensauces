@@ -1,0 +1,3 @@
+type (u16:spritetype)item
+image image:item
+tile 0xff 0

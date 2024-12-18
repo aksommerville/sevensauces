@@ -15,7 +15,7 @@ static void _hello_del(struct layer *layer) {
 
 static void hello_cb_new_game(struct widget *widget) {
   struct layer *layer=widget->userdata;
-  fprintf(stderr,"%s\n",__func__);//TODO
+  sauces_begin_session();
 }
 
 static void hello_cb_settings(struct widget *widget) {

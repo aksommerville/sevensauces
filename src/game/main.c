@@ -1,5 +1,6 @@
 #include "sauces.h"
 #include "layer/layer.h"
+#include "opt/rom/rom.h"
 
 struct g g={0};
 
@@ -31,26 +32,34 @@ int egg_client_init() {
 }
 
 void egg_client_update(double elapsed) {
-
-  struct layer *focus=layer_stack_get_focus();
-  if (!focus) { // There must be a focus layer at all times.
-    fprintf(stderr,"No focus layer.\n");
-    egg_terminate(1);
-    return;
-  }
   
+  // Process any changes to input state.
   int input=egg_input_get_one(0);
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) { // AUX3 to quit, always.
       egg_terminate(0);
       return;
     }
+    struct layer *focus=layer_stack_get_focus();
+    if (!focus) { // There must be a focus layer at all times.
+      fprintf(stderr,"No focus layer.\n");
+      egg_terminate(1);
+      return;
+    }
     layer_input(focus,input,g.pvinput);
     g.pvinput=input;
-    if (!(focus=layer_stack_get_focus())) return; // Receiving input may change the layer stack.
   }
   
-  layer_update(focus,elapsed);
+  // Update all layers down the first that implements (input). Not just the focus layer!
+  int i=g.layerc;
+  while (i-->0) {
+    struct layer *layer=g.layerv[i];
+    if (layer->defunct) {
+      continue;
+    }
+    if (layer->type->update) layer->type->update(layer,elapsed);
+    if (layer->type->input) break;
+  }
   
   layer_stack_reap();
 }
@@ -68,4 +77,45 @@ void egg_client_render() {
     layer_render(g.layerv[layerp]);
   }
   graf_flush(&g.graf);
+}
+
+/* Get resource. TODO We probably ought to index these, at least the high-traffic types.
+ */
+ 
+int sauces_res_get(void *dstpp,int tid,int rid) {
+  struct rom_reader reader;
+  if (rom_reader_init(&reader,g.rom,g.romc)<0) return 0;
+  struct rom_res *res;
+  while (res=rom_reader_next(&reader)) {
+    if (res->tid<tid) continue;
+    if (res->tid>tid) break;
+    if (res->rid<rid) continue;
+    if (res->rid>rid) break;
+    *(const void**)dstpp=res->v;
+    return res->c;
+  }
+  return 0;
+}
+
+/* Format string, replacing '%' with an item name.
+ */
+ 
+
+int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid) {
+  const char *name=0,*fmt=0;
+  int namec,fmtc;
+  if ((namec=strings_get(&name,RID_strings_item_name,itemid))<1) return 0;
+  if ((fmtc=strings_get(&fmt,fmt_rid,fmt_ix))<1) return 0;
+  int dstc=0;
+  for (;fmtc-->0;fmt++) {
+    if (*fmt=='%') {
+      if (dstc>dsta-namec) return 0;
+      memcpy(dst+dstc,name,namec);
+      dstc+=namec;
+    } else {
+      if (dstc>=dsta) return 0;
+      dst[dstc++]=*fmt;
+    }
+  }
+  return dstc;
 }

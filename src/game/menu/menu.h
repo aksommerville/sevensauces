@@ -46,6 +46,9 @@ void menu_move(struct menu *menu,int dx,int dy); // LEFT|RIGHT|UP|DOWN
 
 void menu_render(struct menu *menu);
 
+void menu_set_focus(struct menu *menu,struct widget *widget);
+void menu_force_focus_bounds(struct menu *menu); // Call if you move widgets. Terminates animation and resets cursor position.
+
 /* Adding or removing a widget hands off ownership.
  */
 int menu_add_widget(struct menu *menu,struct widget *widget);
