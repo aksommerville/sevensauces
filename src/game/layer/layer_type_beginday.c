@@ -23,6 +23,7 @@ static int _beginday_init(struct layer *layer) {
   layer->opaque=1;
   if (!g.session||(g.session->day<0)||(g.session->day>6)) return -1;
   
+  session_apply_plants(g.session);
   world_del(g.world);
   if (!(g.world=world_new())) return -1;
   

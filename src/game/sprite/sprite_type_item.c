@@ -65,3 +65,8 @@ const struct sprite_type sprite_type_item={
   .init=_item_init,
   .hero_touch=_item_hero_touch,
 };
+
+void sprite_item_no_blackout(struct sprite *sprite) {
+  if (!sprite||(sprite->type!=&sprite_type_item)) return;
+  SPRITE->init_time=g.world->clock+100.0;
+}

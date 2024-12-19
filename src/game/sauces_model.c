@@ -56,3 +56,22 @@ int sauces_end_day() {
   if (!layer_spawn(&layer_type_kitchen)) return -1;
   return 0;
 }
+
+/* End night.
+ */
+ 
+int sauces_end_night() {
+  layer_stack_filter(filter_layer_nonsession);
+  if (g.kitchen) {
+    kitchen_commit_to_session(g.kitchen);
+    kitchen_del(g.kitchen);
+    g.kitchen=0;
+  }
+  g.session->day++;
+  if (g.session->day>=7) {
+    fprintf(stderr,"*** end of week ***\n");//TODO wrap-up layer
+  } else {
+    if (!layer_spawn(&layer_type_beginday)) return -1;
+  }
+  return 0;
+}

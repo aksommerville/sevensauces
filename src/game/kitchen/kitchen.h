@@ -12,4 +12,6 @@ struct kitchen {
 void kitchen_del(struct kitchen *kitchen);
 struct kitchen *kitchen_new();
 
+void kitchen_commit_to_session(struct kitchen *kitchen);
+
 #endif

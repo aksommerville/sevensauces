@@ -32,4 +32,11 @@ void world_render(struct world *world);
 // Last chance to sync state sessionward before the world gets deleted.
 void world_commit_to_session(struct world *world);
 
+/* tileid on the current tilesheet for a beast of this itemid caught in a trap.
+ * <0 if no such tile exists.
+ */
+int world_tileid_for_trapped_faun(const struct world *world,uint8_t itemid);
+int world_tileid_for_trap(const struct world *world);
+int world_tileid_for_seed(const struct world *world);
+
 #endif

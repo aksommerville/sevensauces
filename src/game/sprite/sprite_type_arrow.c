@@ -1,5 +1,6 @@
 /* sprite_type_arrow.c
- * arg: Direction: 0,1,2,3=left,right,up,down
+ * arg&3: Direction: 0,1,2,3=left,right,up,down
+ * arg&4: Stone, else Arrow.
  * Our nominal position is the position of the shadow. The arrow itself is 0.5 m higher initially.
  */
  
@@ -23,9 +24,11 @@ struct sprite_arrow {
 #define SPRITE ((struct sprite_arrow*)sprite)
 
 static int _arrow_init(struct sprite *sprite) {
-  //if (!sprite->imageid) sprite->imageid=RID_image_sprites1;
-  if (!sprite->tileid) sprite->tileid=0x41; // Shadow must be n+1
-  switch (sprite->arg) {
+  if (!sprite->imageid) {
+    sprite->imageid=RID_image_sprites1;
+    sprite->tileid=(sprite->arg&4)?0x4b:0x41;
+  }
+  switch (sprite->arg&3) {
     case 0: SPRITE->dx=-ARROW_SPEED; sprite->xform=0; break;
     case 1: SPRITE->dx= ARROW_SPEED; sprite->xform=EGG_XFORM_XREV; break;
     case 2: SPRITE->dy=-ARROW_SPEED; sprite->xform=EGG_XFORM_SWAP; break;
@@ -39,6 +42,13 @@ static int _arrow_init(struct sprite *sprite) {
 
 static void _arrow_update(struct sprite *sprite,double elapsed) {
   if ((SPRITE->ttl-=elapsed)<=0.0) {
+    if (sprite->arg&4) {
+      // You can pick up the stone again and reuse it. The tile used by item sprites is oriented toward the bottom of the cell, hence (y-something).
+      struct sprite *itspr=sprite_new(0,sprite->owner,sprite->x,sprite->y-0.400,NS_item_stone<<24,RID_sprite_item);
+      if (itspr) {
+        sprite_item_no_blackout(itspr);
+      }
+    }
     sprite_kill_soon(sprite);
     return;
   }
@@ -58,7 +68,7 @@ static void _arrow_update(struct sprite *sprite,double elapsed) {
 
 static void _arrow_render(struct sprite *sprite,int16_t x,int16_t y) {
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
-  if (SPRITE->ttl<ARROW_FADE_TIME) {
+  if ((SPRITE->ttl<ARROW_FADE_TIME)&&!(sprite->arg&4)) { // Arrows fade out but stones don't.
     int alpha=(SPRITE->ttl*255.0)/ARROW_FADE_TIME;
     if (alpha<0xff) graf_set_alpha(&g.graf,alpha);
   }

@@ -10,6 +10,7 @@
 
 #define SESSION_MAP_LIMIT 8 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
+#define SESSION_PLANT_LIMIT 64 /* Completely arbitrary. I think 64 will be pretty hard to reach. */
 
 struct session {
   int day; // 0..7, if 7 we're done playing
@@ -18,6 +19,16 @@ struct session {
   
   struct map mapv[SESSION_MAP_LIMIT];
   int mapc;
+  
+  /* Plants get recorded here one day, and applied at the start of the next.
+   * Session manages that for the most part.
+   * You must point each plant to a 'seed' cell. If it's something else it will be ignored.
+   * If you need to neutralize a plant, set its mapid or position OOB.
+   */
+  struct plant {
+    int mapid,x,y,itemid;
+  } plantv[SESSION_PLANT_LIMIT];
+  int plantc;
 };
 
 void session_del(struct session *session);
@@ -25,6 +36,7 @@ struct session *session_new();
 
 struct map *session_get_map(struct session *session,int mapid);
 int session_get_free_inventory_slot(const struct session *session);
+int session_count_free_inventory_slots(const struct session *session);
 
 /* Acquire a new item.
  * If you provide either of (cb,userdata), we are allowed to create passive feedback. (sound effect and toast).
@@ -33,11 +45,15 @@ int session_get_free_inventory_slot(const struct session *session);
  */
 int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int invp,void *userdata),void *userdata);
 
+struct plant *session_add_plant(struct session *session);
+void session_apply_plants(struct session *session);
+
 struct item {
   uint8_t flags;
   uint8_t foodgroup;
   uint8_t density;
   uint8_t usage;
+  uint8_t harvestq; // For harvestable things, how many at a time? In general, 3 for flora and 1 for fauna.
 };
 extern const struct item itemv[256];
 

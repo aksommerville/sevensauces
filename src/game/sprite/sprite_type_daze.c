@@ -19,7 +19,7 @@ struct sprite_daze {
 #define SPRITE ((struct sprite_daze*)sprite)
 
 static int _daze_init(struct sprite *sprite) {
-  //if (!sprite->imageid) sprite->imageid=RID_image_sprites1;
+  if (!sprite->imageid) sprite->imageid=RID_image_sprites1;
   if (!sprite->tileid) sprite->tileid=0x43;
   SPRITE->tileid0=sprite->tileid;
   return 0;
@@ -56,4 +56,16 @@ void sprite_daze_setup(struct sprite *sprite,struct sprite *master) {
   SPRITE->master_tileid=SPRITE->master->tileid;
   SPRITE->dx=sprite->x-SPRITE->master->x;
   SPRITE->dy=sprite->y-SPRITE->master->y;
+}
+
+void sprite_daze_drop_for_master(struct sprites *sprites,struct sprite *master) {
+  struct sprite **v;
+  int c=sprites_get_all(&v,sprites);
+  for (;c-->0;v++) {
+    struct sprite *sprite=*v;
+    if (sprite->type!=&sprite_type_daze) continue;
+    if (SPRITE->master!=master) continue;
+    sprite_kill_soon(sprite);
+    // Keep going, there might be more than one.
+  }
 }

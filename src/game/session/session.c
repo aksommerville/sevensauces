@@ -75,6 +75,13 @@ int session_get_free_inventory_slot(const struct session *session) {
   return -1;
 }
 
+int session_count_free_inventory_slots(const struct session *session) {
+  int c=0,i=INVENTORY_SIZE;
+  const uint8_t *v=session->inventory;
+  for (;i-->0;v++) if (!*v) c++;
+  return c;
+}
+
 int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int invp,void *userdata),void *userdata) {
   const struct item *item=itemv+itemid;
   if (!item->flags) { // All real items must have nonzero flags; there's a "valid" flag for this purpose.
@@ -128,4 +135,85 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
     }
   }
   return -1;
+}
+
+/* Plants.
+ */
+ 
+struct plant *session_add_plant(struct session *session) {
+  if (session->plantc>=SESSION_PLANT_LIMIT) return 0;
+  struct plant *plant=session->plantv+session->plantc++;
+  memset(plant,0,sizeof(struct plant));
+  return plant;
+}
+
+static int session_get_map_imageid(const struct map *map) {
+  struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
+  struct rom_command cmd;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode==CMD_map_image) return (cmd.argv[0]<<8)|cmd.argv[1];
+  }
+  return 0;
+}
+
+static void session_read_tilesheet(uint8_t *physics,uint8_t *tsitemid,int imageid) {
+  memset(physics,0,256);
+  memset(tsitemid,0,256);
+  const void *src=0;
+  int srcc=sauces_res_get(&src,EGG_TID_tilesheet,imageid);
+  struct rom_tilesheet_reader reader;
+  if (rom_tilesheet_reader_init(&reader,src,srcc)<0) return;
+  struct rom_tilesheet_entry entry;
+  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
+    switch (entry.tableid) {
+      case NS_tilesheet_physics: memcpy(physics+entry.tileid,entry.v,entry.c); break;
+      case NS_tilesheet_itemid: memcpy(tsitemid+entry.tileid,entry.v,entry.c); break;
+    }
+  }
+}
+
+static int session_get_item_tileid(const uint8_t *physics,const uint8_t *tsitemid,uint8_t itemid) {
+  int tileid=0; for (;tileid<0x100;tileid++,physics++,tsitemid++) {
+    if (*physics!=NS_physics_harvest) continue;
+    if (*tsitemid!=itemid) continue;
+    return tileid;
+  }
+  return -1;
+}
+
+void session_apply_plants(struct session *session) {
+  int mapid=0,imageid=0;
+  struct map *map;
+  uint8_t physics[256],tsitemid[256];
+  const struct plant *plant=session->plantv;
+  int i=session->plantc;
+  session->plantc=0;
+  for (;i-->0;plant++) {
+    if (!plant->mapid) continue;
+    
+    // Avoid reacquiring map and tilesheet for each plant.
+    // The odds are very strong, if there's more than one plant, that they're all on the same map.
+    // And even across maps, they might use the same image ie tilesheet. Loading tilesheets is expensive.
+    if (plant->mapid!=mapid) {
+      mapid=plant->mapid;
+      map=session_get_map(session,mapid);
+    }
+    if (!map) continue;
+    if ((plant->x<0)||(plant->y<0)||(plant->x>=map->w)||(plant->y>=map->h)) continue;
+    int nimageid=session_get_map_imageid(map);
+    if (nimageid!=imageid) {
+      imageid=nimageid;
+      session_read_tilesheet(physics,tsitemid,imageid);
+    }
+    
+    int cellp=plant->y*map->w+plant->x;
+    uint8_t tileid=map->v[cellp];
+    if (physics[tileid]!=NS_physics_seed) continue;
+    int ntileid=session_get_item_tileid(physics,tsitemid,plant->itemid);
+    if (ntileid<0) {
+      fprintf(stderr,"tilesheet:%d has no plant tile for item 0x%02x\n",imageid,plant->itemid);
+      continue;
+    }
+    map->v[cellp]=ntileid;
+  }
 }

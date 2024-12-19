@@ -21,6 +21,19 @@ static void _kitchen_del(struct layer *layer) {
   menu_del(LAYER->menu);
 }
 
+/* Menu callbacks.
+ */
+ 
+static void kitchen_cb_activate(struct menu *menu,struct widget *widget) {
+  struct layer *layer=menu->userdata;
+  sauces_end_night();
+}
+ 
+static void kitchen_cb_cancel(struct menu *menu) {
+  struct layer *layer=menu->userdata;
+  sauces_end_night();
+}
+
 /* Init.
  */
  
@@ -28,6 +41,13 @@ static int _kitchen_init(struct layer *layer) {
   if (!g.kitchen) return -1;
   layer->opaque=1;
   if (!(LAYER->menu=menu_new())) return -1;
+  LAYER->menu->userdata=layer;
+  LAYER->menu->cb_activate=kitchen_cb_activate;
+  LAYER->menu->cb_cancel=kitchen_cb_cancel;
+  
+  struct widget *widget=widget_decal_spawn_text(LAYER->menu,FBW>>1,FBH>>1,0,"TODO: kitchen. Any key to proceed.",-1,FBW,0xffffffff,0,0);
+  if (!widget) return -1;
+  widget->accept_focus=0;
   //TODO populate menu
   return 0;
 }

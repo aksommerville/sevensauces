@@ -165,7 +165,7 @@ void sprites_update(struct sprites *sprites,double elapsed) {
     if (sprite->type->update) {
       sprite->type->update(sprite,elapsed);
       // If the focus layer changed during a sprite update -- entirely possible -- get out immediately.
-      if (layer_stack_get_focus()!=layer) break;
+      if (layer_stack_get_focus()!=layer) return;
     }
   }
   

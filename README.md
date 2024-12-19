@@ -5,12 +5,19 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 ## TODO
 
 - [ ] Finish onboarding sprites copied from 20241217
-- - [ ] Harvest
+- - [x] Harvest
 - - [x] "drop" and "free" usages for hero.
-- [ ] Fauna parameters.
+- [x] Fauna parameters.
+- [x] Make 'arrow' sprite work for stone too.
+- [ ] Sword
+- [ ] Grapple
+- [ ] Fishpole
+- [ ] Letter
+- [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
+- [ ] Freshen tree and trap tiles. Lots are missing, and we have a bunch with no item anymore. And all look bad.
 - [ ] Sort sprites before render
 - [ ] Doors
-- [ ] Transient entities
+- [ ] Transient entities: Vegetables, animals, stones...
 - [ ] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Condensery
 - [ ] Kitchen

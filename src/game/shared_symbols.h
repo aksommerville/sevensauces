@@ -9,11 +9,14 @@
 #define NS_sys_mapw 20
 #define NS_sys_maph 15
 
-#define CMD_map_image     0x20 /* u16:imageid */
-#define CMD_map_hero      0x21 /* u16:pos */
-#define CMD_map_neighbors 0x60 /* u16:left u16:right u16:up u16:down */
-#define CMD_map_sprite    0x61 /* u16:pos u16:spriteid u32:reserved */
-#define CMD_map_door      0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
+#define CMD_map_image      0x20 /* u16:imageid */
+#define CMD_map_hero       0x21 /* u16:pos */
+#define CMD_map_home       0x22 /* u16:pos */
+#define CMD_map_condensery 0x23 /* u16:pos */
+#define CMD_map_shop       0x40 /* u16:pos u16:shopid */
+#define CMD_map_neighbors  0x60 /* u16:left u16:right u16:up u16:down */
+#define CMD_map_sprite     0x61 /* u16:pos u16:spriteid u32:reserved */
+#define CMD_map_door       0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
 
 #define CMD_sprite_image  0x20 /* u16:imageid */
 #define CMD_sprite_tile   0x21 /* u8:tileid u8:xform */
@@ -30,12 +33,13 @@
 #define NS_physics_water 2
 #define NS_physics_harvest 3
 #define NS_physics_diggable 4
+#define NS_physics_trap 5
+#define NS_physics_seed 6
 
 #define NS_spritetype_dummy     0
 #define NS_spritetype_hero      1
 #define NS_spritetype_item      2
 #define NS_spritetype_arrow     3
-#define NS_spritetype_rabbit    4 /*XXX replace by faun */
 #define NS_spritetype_daze      5
 #define NS_spritetype_faun      6
 #define FOR_EACH_SPRITE_TYPE \
@@ -43,7 +47,6 @@
   _(hero) \
   _(item) \
   _(arrow) \
-  _(rabbit) \
   _(daze) \
   _(faun)
   
@@ -55,6 +58,7 @@
 
 #define NS_itemflag_valid 0 /* This flag doesn't mean anything, but a full-zero flags byte means "unused". */
 #define NS_itemflag_cell  1 /* Hero should highlight the operative cell when armed. */
+#define NS_itemflag_plant 2 /* Allowed to plant. */
 
 #define NS_itemusage_none     0 /* Not an item you can use. */
 #define NS_itemusage_drop     1 /* Create an 'item' sprite that can be picked up. */
@@ -73,6 +77,8 @@
  *   src/data/strings/*-3-item_name
  *   src/data/strings/*-4-item_desc
  *   src/data/image/5-item.png
+ * If it's an animal:
+ *   src/game/sprite/sprite_type_faun.c
  */
 #define NS_item_none              0 /* Special blank slot at id zero. */
 #define NS_item_rabbit         0x01 /* Meat... */
@@ -85,6 +91,7 @@
 #define NS_item_sheep          0x08
 #define NS_item_deer           0x09
 #define NS_item_cow            0x0a
+#define NS_item_fish           0x0b
 #define NS_item_carrot         0x20 /* Vegetables... */
 #define NS_item_potato         0x21
 #define NS_item_cabbage        0x22

@@ -41,8 +41,11 @@ int sauces_begin_session();
 void sauces_end_session();
 
 /* Pops the world layer, creates the kitchen model, and pushes a kitchen layer.
+ * This is wildly unsafe during a world update.
+ * If a sprite controller or something wants to end day, instead force the clock to zero and let layer handle it.
  */
 int sauces_end_day();
+int sauces_end_night();
 
 int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid);
 

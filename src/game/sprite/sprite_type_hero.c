@@ -9,6 +9,8 @@
 
 #define HERO_TOUCH_LIMIT 16 /* How many simultaneously touched sprites? Really, one should do the trick. */
 
+static int hero_drop_item(struct sprite *sprite,uint8_t itemid);
+
 struct sprite_hero {
   struct sprite hdr;
   int walkdx,walkdy; // State of the dpad.
@@ -83,34 +85,22 @@ static void hero_check_touches(struct sprite *sprite) {
   }
 }
 
-/* Get the item metadata whose planted tile is given.
- * itemid is (item-item_metadata).
- * Can be null.
+/* Callback from a deferred single-item harvest.
  */
  
-static const struct item_metadata *hero_item_for_tileid(uint8_t tileid) {
-  /*TODO copied from 20241217
-  const struct item_metadata *meta=item_metadata;
-  int i=256;
-  for (;i-->0;meta++) {
-    if (meta->plant_tileid!=tileid) continue;
-    return meta;
-  }
-  /**/
-  return 0;
-}
-
-/* Harvesting a crop, but we have no room in inventory: Create an item sprite somewhere close.
- */
- 
-static void hero_harvest_and_drop(struct sprite *sprite,uint8_t itemid) {
-  //TODO Look for a decent spot. In particular, there can be two harvest-and-drops at the same time, don't put them on top of each other!
-  /*TODO copied from 20241217
-  double x=sprite->x+SPRITE->facedx;
-  double y=sprite->y+SPRITE->facedy;
-  struct sprite *item=sprite_new(0,sprite->owner,x,y,itemid,RID_sprite_item);
-  if (!item) return;
-  /**/
+static void hero_cb_harvest(int invp,void *userdata) {
+  struct sprite *sprite=userdata;
+  if ((invp<0)||(invp>=16)) return; // Cancel, no worries.
+  uint8_t itemid_drop=g.session->inventory[invp];
+  if (!itemid_drop) return;
+  int cellp=SPRITE->row*g.world->map->w+SPRITE->col;
+  uint8_t tileid=g.world->map->v[cellp];
+  uint8_t itemid_take=g.world->tsitemid[tileid];
+  const struct item *item=itemv+itemid_take;
+  if (item->harvestq!=1) return; // Impossible but stay safe.
+  g.world->map->v[cellp]=g.world->map->ro[cellp];
+  g.session->inventory[invp]=itemid_take;
+  hero_drop_item(sprite,itemid_drop);
 }
 
 /* Check whether I've moved to a new cell, and if so look for quantized actions.
@@ -129,69 +119,54 @@ static void hero_check_cell(struct sprite *sprite) {
   switch (physics) {
   
     case NS_physics_harvest: {
-        /*TODO copied from 20241217
-        const struct item_metadata *meta=hero_item_for_tileid(tileid);
-        if (meta) {
-          uint8_t itemid=meta-item_metadata;
-          int harvested=0;
-          int quantity=(meta->foodgroup==NS_foodgroup_meat)?1:3;
-          int i=0; for (;i<quantity;i++) {
-            int inventoryp=session_get_free_inventory_slot(g.session);
-            if (inventoryp<0) {
-              if (!harvested) break; // No room at all? Don't harvest it.
-              hero_harvest_and_drop(sprite,itemid);
-            } else {
-              harvested++;
-              g.session->inventory[inventoryp]=itemid;
-            }
-          }
-          if (harvested) {
-            //TODO sound effect
-            //TODO passive toast like "Picked up 2 pumpkins"
-            g.world->map->v[cellp]=0;
-          }
+        uint8_t itemid=g.world->tsitemid[tileid];
+        const struct item *item=itemv+itemid;
+        if (!item->harvestq) {
+          fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x with invalid harvestq=%d\n",g.world->map_imageid,tileid,itemid,item->harvestq);
+          break;
         }
-        /**/
+        // Single-harvest items like animal traps are easy.
+        if (item->harvestq==1) {
+          int result=session_acquire_item(g.session,itemid,hero_cb_harvest,sprite);
+          if (result>0) {
+            g.world->map->v[cellp]=g.world->map->ro[cellp];
+          }
+          break;
+        }
+        // Multi-harvest like crops are a trick.
+        int freec=session_count_free_inventory_slots(g.session);
+        if (item->harvestq>freec) {
+          // If you don't have 3 available slots, you can't pick crops.
+          // Picking less than 3 isn't an option, we don't have tiles for the 1 and 2 cases.
+          // We could prompt like in the single case, but I don't like prompting 3 times.
+          // Alternately, we could pick what's possible and create sprites for the remainder. I'm not crazy about that either.
+          // Leaving it blank is not too bad, and I'll keep it this way, at least for now.
+        } else {
+          session_acquire_item(g.session,itemid,0,"passive");
+          int i=1; for (;i<item->harvestq;i++) { // Don't produce feedback after the first one.
+            session_acquire_item(g.session,itemid,0,0);
+          }
+          g.world->map->v[cellp]=g.world->map->ro[cellp];
+        }
       } break;
 
   }
-  struct rom_command_reader reader={.v=g.world->map->cmdv,.c=g.world->map->cmdc};
-  struct rom_command cmd;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
-    // All positioned commands start with (u8 x,u8 y).
-    if ((cmd.argc<2)||(cmd.argv[0]!=col)||(cmd.argv[1]!=row)) continue;
-    switch (cmd.opcode) {
-      /*TODO copied from 20241217
+  struct poi *poi;
+  int i=map_get_poi(&poi,g.world->map,col,row);
+  for (;i-->0;poi++) {
+    switch (poi->opcode) {
+    
       case CMD_map_home: {
-          struct layer *prompt=layer_spawn(&layer_type_prompt);
-          if (!prompt) return;
-          layer_prompt_setup(prompt,RID_strings_ui,8,3,hero_cb_home,0);
-          sprite_hero_end_motion(sprite,0,0);
-        } break;
-      case CMD_map_shop: {
-          struct layer *shop=layer_spawn(&layer_type_shop);
-          if (!shop) return;
-          layer_shop_setup(shop,g.session,(cmd.argv[2]<<8)|cmd.argv[3]);
-          sprite->x=col+0.5;
-          sprite->y=row+0.5;
-          sprite_hero_end_motion(sprite,0,0);
-          SPRITE->facedx=0;
-          SPRITE->facedy=1;
-        } break;
-      case CMD_map_condensery: {
-          struct layer *cry=layer_spawn(&layer_type_condensery);
-          if (!cry) return;
-          layer_condensery_setup(cry,g.session);
-          sprite->x=col+0.5;
-          sprite->y=row+0.5;
-          sprite_hero_end_motion(sprite,0,0);
-          SPRITE->facedx=0;
-          SPRITE->facedy=1;
-        } break;
-      /**/
+          //XXX quick hack during dev. In real life, present a query modal "Are you sure?"
+          g.world->clock=0.0;
+        } return;
+        
+      case CMD_map_shop: break;//TODO
+      case CMD_map_condensery: break;//TODO
+      case CMD_map_door: break;//TODO
+    
     }
   }
-  //TODO doors
 }
 
 /* Update.
@@ -313,22 +288,32 @@ void sprite_hero_end_motion(struct sprite *sprite,int dx,int dy) {
 }
 
 /* Drop selected item.
+ * Plain hero_drop_item() can be used out of context. It doesn't interact with globals or produce a sound effect.
  */
  
-static void hero_drop_item(struct sprite *sprite,uint8_t itemid) {
+static int hero_drop_item(struct sprite *sprite,uint8_t itemid) {
+  const struct item *item=itemv+itemid;
+  if (!item->flags) return -1;
   double x=sprite->x+SPRITE->facedx,y=sprite->y+SPRITE->facedy;
   sprites_find_spawn_position(&x,&y,sprite->owner);
-  struct sprite *item=sprite_new(0,sprite->owner,x,y,itemid<<24,RID_sprite_item);
-  if (!item) return;
+  struct sprite *nspr=0;
+  if (item->usage==NS_itemusage_free) {
+    nspr=sprite_new(0,sprite->owner,x,y,itemid<<24,RID_sprite_faun);
+  } else {
+    nspr=sprite_new(0,sprite->owner,x,y,itemid<<24,RID_sprite_item);
+  }
+  if (!nspr) return -1;
+  return 0;
+}
+ 
+static void hero_drop_item_manual(struct sprite *sprite,uint8_t itemid) {
+  if (hero_drop_item(sprite,itemid)<0) return;
   egg_play_sound(RID_sound_dropitem);
   g.session->inventory[g.session->invp]=0;
 }
 
 static void hero_free_faun(struct sprite *sprite,uint8_t itemid) {
-  double x=sprite->x+SPRITE->facedx,y=sprite->y+SPRITE->facedy;
-  sprites_find_spawn_position(&x,&y,sprite->owner);
-  struct sprite *faun=sprite_new(0,sprite->owner,x,y,itemid<<24,RID_sprite_faun);
-  if (!faun) return;
+  if (hero_drop_item(sprite,itemid)<0) return;
   egg_play_sound(RID_sound_freefaun);
   g.session->inventory[g.session->invp]=0;
 }
@@ -352,7 +337,7 @@ static void hero_begin_bow(struct sprite *sprite) {
   else                       { arg=3; y+=0.5; }
   struct sprite *arrow=sprite_new(&sprite_type_arrow,sprite->owner,x,y,arg,0);
   if (!arrow) return;
-  //TODO sound effect
+  egg_play_sound(RID_sound_arrow);
 }
 
 /* Grapple.
@@ -400,20 +385,14 @@ static void hero_begin_fishpole(struct sprite *sprite) {
 /* Shovel.
  */
  
-static void hero_cb_shovel(int inventoryp,void *userdata) {
-  /*TODO copied from 20241217
-  if ((inventoryp<0)||(inventoryp>=INVENTORY_SIZE)) return; // Cancelled, don't care.
+static void hero_cb_shovel(int invp,void *userdata) {
   struct sprite *sprite=userdata;
-  uint8_t itemid=g.session->inventory[inventoryp];
-  const struct item_metadata *meta=item_metadata+itemid;
-  if (!(meta->itemflag&(1<<NS_itemflag_plantable))) { // Invalid item for planting.
+  if ((invp<0)||(invp>=16)) return;
+  uint8_t itemid=g.session->inventory[invp];
+  const struct item *item=itemv+itemid;
+  if (!(item->flags&(1<<NS_itemflag_plant))) {
     struct layer *msg=layer_spawn(&layer_type_message);
-    layer_message_setup(msg,RID_strings_ui,5);
-    return;
-  }
-  if (g.session->plantc>=PLANT_LIMIT) { // Too many plants.
-    struct layer *msg=layer_spawn(&layer_type_message);
-    layer_message_setup(msg,RID_strings_ui,6);
+    layer_message_setup_string(msg,RID_strings_ui,20);
     return;
   }
   int col=-123,row;
@@ -429,82 +408,97 @@ static void hero_cb_shovel(int inventoryp,void *userdata) {
     // Shouldn't happen; we checked before the query.
     return;
   }
-  g.world->map->v[cellp]=0x0f;
-  g.session->inventory[inventoryp]=0;
-  struct plant *plant=g.session->plantv+g.session->plantc++;
+  int ntileid=world_tileid_for_seed(g.world);
+  if (ntileid<0) return;
+  struct plant *plant=session_add_plant(g.session);
+  if (!plant) {
+    struct layer *msg=layer_spawn(&layer_type_message);
+    layer_message_setup_string(msg,RID_strings_ui,21);
+    return;
+  }
   plant->mapid=g.world->map->rid;
   plant->x=col;
   plant->y=row;
   plant->itemid=itemid;
-  /**/
+  g.world->map->v[cellp]=ntileid;
+  g.session->inventory[invp]=0;
+  egg_play_sound(RID_sound_plant);
 }
  
 static void hero_begin_shovel(struct sprite *sprite) {
-  /*TODO copied from 20241217
   int col=-123,row;
   hero_get_item_cell(&col,&row,sprite);
   if ((col<0)||(row<0)||(col>=g.world->map->w)||(row>=g.world->map->h)) {
-    // TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
   uint8_t physics=g.world->physics[tileid];
   if (physics!=NS_physics_diggable) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
-  struct layer *pickitem=layer_spawn(&layer_type_pickitem);
-  if (!pickitem) return;
-  layer_pickitem_setup(pickitem,g.session,RID_strings_ui,4,hero_cb_shovel,sprite);
-  sprite_hero_end_motion(sprite,0,0);
-  /**/
+  if (world_tileid_for_seed(g.world)<0) {
+    fprintf(stderr,"tilesheet:%d has no seed tile\n",g.world->map_imageid);
+    return;
+  }
+  struct layer *pause=layer_spawn(&layer_type_pause);
+  if (!pause) return;
+  const char *prompt,*cancel;
+  int promptc=strings_get(&prompt,RID_strings_ui,19);
+  int cancelc=strings_get(&cancel,RID_strings_ui,18);
+  layer_pause_setup_query(pause,prompt,promptc,cancel,cancelc,hero_cb_shovel,sprite);
 }
 
 /* Trap.
  * It functions a lot like the shovel, but a few differences:
  *  - Single-use.
  *  - Bears animals instead of vegetables.
- *  - You don't commit a separate item like planting. TODO It would make narrative sense, if you have to supply bait with each trap. Should we?
- *  - What blooms will depend on location rather than bait.
+ *  - What blooms will depend entirely on location.
+ *  - The placed trap is recorded entirely by a map cell, no extra bookkeeping.
  */
  
 static void hero_begin_trap(struct sprite *sprite) {
-  /*TODO copied from 20241217
   int col=-123,row;
   hero_get_item_cell(&col,&row,sprite);
   if ((col<0)||(row<0)||(col>=g.world->map->w)||(row>=g.world->map->h)) {
-    // TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
   uint8_t physics=g.world->physics[tileid];
-  // Not sure if this makes sense, but we're restricting to NS_physics_diggable like the shovel.
-  // Main reason is we're going to overwrite the map cell, and NS_physics_vacant would include too many important things.
+  // Target cell has to be diggable -- those are the tiles we've arranged to be visually replaceable by a trap (or a hole).
   if (physics!=NS_physics_diggable) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
-  if (g.session->trapc>=TRAP_LIMIT) {
-    struct layer *msg=layer_spawn(&layer_type_message);
-    layer_message_setup(msg,RID_strings_ui,7);
+  int ntileid=world_tileid_for_trap(g.world);
+  if (ntileid<0) {
+    fprintf(stderr,"tilesheet:%d does not contain a trap tile\n",g.world->map_imageid);
+    // No sound effect here; this is a technical error. sorry.
     return;
   }
-  g.world->map->v[cellp]=0x0d;
-  g.session->inventory[g.session->inventoryp]=0;
-  struct trap *trap=g.session->trapv+g.session->trapc++;
-  trap->mapid=g.world->map->rid;
-  trap->x=col;
-  trap->y=row;
-  /**/
+  egg_play_sound(RID_sound_placetrap);
+  g.world->map->v[cellp]=ntileid;
+  g.session->inventory[g.session->invp]=0;
 }
 
 /* Stone.
  */
  
 static void hero_begin_stone(struct sprite *sprite) {
-  fprintf(stderr,"TODO %s\n",__func__);
+  double x=sprite->x,y=sprite->y;
+  uint32_t arg=4;
+       if (SPRITE->facedx<0) { arg|=0; y+=0.5; }
+  else if (SPRITE->facedx>0) { arg|=1; y+=0.5; }
+  else if (SPRITE->facedy<0) { arg|=2; }
+  else                       { arg|=3; y+=0.5; }
+  struct sprite *stone=sprite_new(&sprite_type_arrow,sprite->owner,x,y,arg,0);
+  if (!stone) return;
+  egg_play_sound(RID_sound_stone);
+  g.session->inventory[g.session->invp]=0;
 }
 
 /* Letter (both Apology and Love Letter).
@@ -521,7 +515,7 @@ void sprite_hero_action(struct sprite *sprite) {
   uint8_t itemid=g.session->inventory[g.session->invp];
   const struct item *item=itemv+itemid;
   switch (item->usage) {
-    case NS_itemusage_drop: hero_drop_item(sprite,itemid); break;
+    case NS_itemusage_drop: hero_drop_item_manual(sprite,itemid); break;
     case NS_itemusage_free: hero_free_faun(sprite,itemid); break;
     case NS_itemusage_sword: hero_begin_sword(sprite); break;
     case NS_itemusage_bow: hero_begin_bow(sprite); break;

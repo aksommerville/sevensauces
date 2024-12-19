@@ -128,3 +128,40 @@ void world_update(struct world *world,double elapsed) {
  
 void world_commit_to_session(struct world *world) {
 }
+
+/* Special tiles.
+ */
+ 
+int world_tileid_for_trapped_faun(const struct world *world,uint8_t itemid) {
+  if (!itemid) return -1;
+  const uint8_t *p=world->tsitemid;
+  int tileid=0;
+  for (;tileid<0x100;tileid++,p++) {
+    if (*p==itemid) {
+      if (world->physics[tileid]!=NS_physics_harvest) {
+        fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x but physics is not NS_physics_harvest (%d). Can't use it.\n",world->map_imageid,tileid,itemid,world->physics[tileid]);
+        continue;
+      }
+      return tileid;
+    }
+  }
+  return -1;
+}
+
+int world_tileid_for_trap(const struct world *world) {
+  const uint8_t *p=world->physics;
+  int tileid=0;
+  for (;tileid<0x100;tileid++,p++) {
+    if (*p==NS_physics_trap) return tileid;
+  }
+  return -1;
+}
+
+int world_tileid_for_seed(const struct world *world) {
+  const uint8_t *p=world->physics;
+  int tileid=0;
+  for (;tileid<0x100;tileid++,p++) {
+    if (*p==NS_physics_seed) return tileid;
+  }
+  return -1;
+}

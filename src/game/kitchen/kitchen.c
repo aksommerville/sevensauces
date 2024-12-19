@@ -18,3 +18,9 @@ struct kitchen *kitchen_new() {
   if (!kitchen) return 0;
   return kitchen;
 }
+
+/* Commit to session, last chance to persist anything.
+ */
+ 
+void kitchen_commit_to_session(struct kitchen *kitchen) {
+}

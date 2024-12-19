@@ -13,6 +13,8 @@
 struct sprite_faun {
   struct sprite hdr;
   double blackout; // Initial period where we will not allow capture.
+  double stun_time;
+  double stun_clock;
   double capture_time; // Constant; how long must hero collide in order to catch us?
   double capture_clock; // Volatile, counts down while overlapped.
   double capture_d2; // Constant; Must stay within this distance to capture (squared, so we don't have to root it each time).
@@ -26,6 +28,7 @@ struct sprite_faun {
   double wait_time_lo,wait_time_hi,wait_time_spook; // Constant.
   double wait_clock;
   double dx,dy;
+  int col,row;
 };
 
 #define SPRITE ((struct sprite_faun*)sprite)
@@ -49,11 +52,14 @@ static int _faun_init(struct sprite *sprite) {
   SPRITE->wait_clock=0.0;
   SPRITE->dx=0.0;
   SPRITE->dy=0.0;
+  SPRITE->col=-1;
+  SPRITE->stun_clock=0.0;
   
   // Set some defaults in case it's not implemented yet, but we'll override below per item.
   // These defaults are pretty good; the spook speed and wait time work out to match the hero's speed almost exactly.
   sprite->imageid=RID_image_item;
   sprite->tileid=itemid;
+  SPRITE->stun_time=1.000;
   SPRITE->capture_time=0.500;
   SPRITE->capture_d2=1.0; // Unsquared while we set up, for clarity.
   SPRITE->spook_d2=5.0; // ''
@@ -69,7 +75,90 @@ static int _faun_init(struct sprite *sprite) {
   SPRITE->wait_time_spook=0.080;
   
   switch (itemid) {
-    //TODO Parameters for all known beasts.
+    case NS_item_rabbit: {
+        SPRITE->spook_d2=8.0;
+        SPRITE->safe_d2=12.0;
+        SPRITE->speed_lo=4.0;
+        SPRITE->speed_hi=6.0;
+        SPRITE->speed_spook=10.0;
+        SPRITE->burst_time_lo=0.333;
+        SPRITE->burst_time_hi=1.000;
+        SPRITE->burst_time_spook=0.333;
+      } break;
+    case NS_item_rat: {
+        SPRITE->spook_d2=3.0;
+        SPRITE->safe_d2=6.0;
+      } break;
+    case NS_item_quail: {
+        SPRITE->spook_d2=4.0;
+        SPRITE->safe_d2=6.0;
+        SPRITE->burst_time_spook=0.500;
+        SPRITE->wait_time_spook=0.125;
+        SPRITE->wait_time_lo=0.400;
+        SPRITE->wait_time_hi=0.800;
+      } break;
+    case NS_item_goat: {
+        SPRITE->spook_d2=4.0;
+        SPRITE->safe_d2=8.0;
+        SPRITE->speed_lo=0.750;
+        SPRITE->speed_hi=2.500;
+        SPRITE->speed_spook=6.0;
+        SPRITE->burst_time_lo=0.750;
+        SPRITE->burst_time_hi=1.250;
+        SPRITE->burst_time_spook=0.800;
+        SPRITE->wait_time_lo=0.250;
+        SPRITE->wait_time_hi=0.500;
+        SPRITE->wait_time_spook=0.125;
+      } break;
+    case NS_item_pig: {
+        SPRITE->spook_d2=2.0;
+        SPRITE->safe_d2=5.0;
+        SPRITE->speed_lo=1.0;
+        SPRITE->speed_hi=3.0;
+        SPRITE->speed_spook=6.0;
+        SPRITE->burst_time_lo=1.000;
+        SPRITE->burst_time_hi=2.500;
+        SPRITE->burst_time_spook=0.800;
+        SPRITE->wait_time_lo=0.500;
+        SPRITE->wait_time_hi=0.750;
+        SPRITE->wait_time_spook=0.100;
+      } break;
+    case NS_item_sheep: {
+        SPRITE->spook_d2=2.0;
+        SPRITE->safe_d2=4.0;
+        SPRITE->speed_lo=0.750;
+        SPRITE->speed_hi=2.500;
+        SPRITE->speed_spook=6.0;
+        SPRITE->burst_time_lo=0.750;
+        SPRITE->burst_time_hi=1.250;
+        SPRITE->burst_time_spook=0.800;
+        SPRITE->wait_time_lo=0.250;
+        SPRITE->wait_time_hi=0.500;
+        SPRITE->wait_time_spook=0.125;
+      } break;
+    case NS_item_deer: {
+        SPRITE->spook_d2=8.0;
+        SPRITE->safe_d2=12.0;
+        SPRITE->speed_lo=4.0;
+        SPRITE->speed_hi=6.0;
+        SPRITE->speed_spook=12.0;
+        SPRITE->burst_time_lo=0.250;
+        SPRITE->burst_time_hi=0.750;
+        SPRITE->burst_time_spook=0.400;
+      } break;
+    case NS_item_cow: {
+        SPRITE->spook_d2=1.5;
+        SPRITE->safe_d2=3.0;
+        SPRITE->speed_lo=0.500;
+        SPRITE->speed_hi=2.000;
+        SPRITE->speed_spook=5.0;
+        SPRITE->burst_time_lo=0.500;
+        SPRITE->burst_time_hi=1.000;
+        SPRITE->burst_time_spook=0.500;
+        SPRITE->wait_time_lo=0.500;
+        SPRITE->wait_time_hi=0.750;
+        SPRITE->wait_time_spook=0.125;
+      } break;
     default: fprintf(stderr,"%s:%d:%s: No handler for item 0x%02x\n",__FILE__,__LINE__,__func__,itemid); break;
   }
   
@@ -189,6 +278,58 @@ static void faun_step(struct sprite *sprite,double elapsed) {
   }
 }
 
+/* Check for collision against arrows, or other harmful sprites.
+ */
+ 
+static void faun_check_arrows(struct sprite *sprite) {
+  double l=sprite->x-0.5,r=sprite->x+0.5,t=sprite->y-0.5,b=sprite->y+0.5;
+  struct sprite **v;
+  int c=sprites_get_all(&v,sprite->owner);
+  for (;c-->0;v++) {
+    struct sprite *other=*v;
+    if (other->type!=&sprite_type_arrow) continue;
+    if (other->x<l) continue;
+    if (other->x>r) continue;
+    if (other->y<t) continue;
+    if (other->y>b) continue;
+    sprite_kill_soon(other);
+    //TODO stunned tile
+    if (SPRITE->stun_clock<=0.0) {
+      struct sprite *daze=sprite_new(&sprite_type_daze,sprite->owner,sprite->x,sprite->y-0.5,0,0);
+      if (daze) sprite_daze_setup(daze,sprite);
+    }
+    SPRITE->stun_clock=SPRITE->stun_time;
+    return;
+  }
+}
+
+/* Update quantized position and check for traps or other map hazards if changed.
+ */
+ 
+static void faun_check_traps(struct sprite *sprite) {
+  int col=(int)sprite->x,row=(int)sprite->y;
+  if ((col==SPRITE->col)&&(row==SPRITE->row)) return;
+  SPRITE->col=col;
+  SPRITE->row=row;
+  if ((col<0)||(row<0)||(col>=g.world->map->w)||(row>=g.world->map->h)) return;
+  int cellp=row*g.world->map->w+col;
+  uint8_t tileid=g.world->map->v[cellp];
+  uint8_t physics=g.world->physics[tileid];
+  if (physics==NS_physics_trap) {
+    uint8_t itemid=sprite->arg>>24;
+    int tileid=world_tileid_for_trapped_faun(g.world,itemid);
+    if (tileid<0) {
+      fprintf(stderr,
+        "%s:%d: Faun 0x%02x should have been caught at %d,%d but tilesheet:%d doesn't have a trapped tile for it.\n",
+        __FILE__,__LINE__,itemid,col,row,g.world->map->rid
+      );
+    } else {
+      g.world->map->v[cellp]=tileid;
+      sprite_kill_soon(sprite);
+    }
+  }
+}
+
 /* Update.
  */
  
@@ -217,6 +358,18 @@ static void _faun_update(struct sprite *sprite,double elapsed) {
   } else {
     SPRITE->capture_clock=0.0;
   }
+
+  /* If we're stunned, nothing else happens, just capture and the stun clock.
+   */
+  if (SPRITE->stun_clock>0.0) {
+    if ((SPRITE->stun_clock-=elapsed)<=0.0) {
+      //TODO Un-stun.
+      sprite_daze_drop_for_master(sprite->owner,sprite);
+      faun_choose_next_move(sprite,0);
+    } else {
+      return;
+    }
+  }
   
   /* Check spookage.
    */
@@ -241,6 +394,11 @@ static void _faun_update(struct sprite *sprite,double elapsed) {
   }
   
   //TODO animation
+  
+  /* Check for hazards.
+   */
+  faun_check_arrows(sprite);
+  faun_check_traps(sprite);
 }
 
 /* Type definition.

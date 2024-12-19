@@ -43,11 +43,7 @@ static void _lw_input(struct layer *layer,int input,int pvinput) {
 static void _lw_update(struct layer *layer,double elapsed) {
   world_update(g.world,elapsed);
   if (g.world->clock<=0.0) {
-    fprintf(stderr,"%s:%d: END DAY\n",__FILE__,__LINE__);
     if (sauces_end_day()<0) egg_terminate(1);
-    fprintf(stderr,"%s:%d\n",__FILE__,__LINE__);
-  } else if (g.world->clock<10.0) {
-    fprintf(stderr,"clock=%f\n",g.world->clock);
   }
 }
 

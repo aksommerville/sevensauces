@@ -83,6 +83,7 @@ extern const struct layer_type layer_type_world;
 extern const struct layer_type layer_type_kitchen;
 extern const struct layer_type layer_type_pause;
 extern const struct layer_type layer_type_toast;
+extern const struct layer_type layer_type_message;
 
 /* "global" is the regular pause menu. It can change the session's chosen slot, and can abort the session.
  * "query" takes an optional prompt and reports the chosen item to your callback, or <0 if cancelled.
@@ -98,6 +99,9 @@ int layer_pause_setup_query(
 // Toasts can be configured either in framebuffer pixels or world meters. If world, we react to future scrolling.
 int layer_toast_setup_fb(struct layer *layer,int x,int y,const char *msg,int msgc,uint32_t rgba);
 int layer_toast_setup_world(struct layer *layer,double x,double y,const char *msg,int msgc,uint32_t rgba);
+
+int layer_message_setup_raw(struct layer *layer,const char *src,int srcc);
+int layer_message_setup_string(struct layer *layer,int rid,int ix);
 
 /* Extra helpers for layer implementations.
  *****************************************************************/

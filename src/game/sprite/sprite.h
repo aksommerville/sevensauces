@@ -132,7 +132,11 @@ void sprite_hero_end_motion(struct sprite *sprite,int dx,int dy);
 void sprite_hero_action(struct sprite *sprite);
 void sprite_hero_end_action(struct sprite *sprite);
 
+void sprite_item_no_blackout(struct sprite *sprite);
+
 // Daze remains locked to master's position, and deletes self when master's tileid changes. You must set the initial position.
+// If you're not going to change tileid, you can manually drop all dazes for a given master too.
 void sprite_daze_setup(struct sprite *sprite,struct sprite *master);
+void sprite_daze_drop_for_master(struct sprites *sprites,struct sprite *master);
  
 #endif
