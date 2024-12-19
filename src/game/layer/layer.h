@@ -85,7 +85,7 @@ extern const struct layer_type layer_type_pause;
 extern const struct layer_type layer_type_toast;
 extern const struct layer_type layer_type_message;
 extern const struct layer_type layer_type_status;
-extern const struct layer_type layer_type_query;
+extern const struct layer_type layer_type_fishing;
 
 /* "global" is the regular pause menu. It can change the session's chosen slot, and can abort the session.
  * "query" takes an optional prompt and reports the chosen item to your callback, or <0 if cancelled.
@@ -104,6 +104,8 @@ int layer_toast_setup_world(struct layer *layer,double x,double y,const char *ms
 
 int layer_message_setup_raw(struct layer *layer,const char *src,int srcc);
 int layer_message_setup_string(struct layer *layer,int rid,int ix);
+
+int layer_fishing_setup(struct layer *layer,void (*cb)(int outcome,void *userdata),void *userdata);
 
 /* Extra helpers for layer implementations.
  *****************************************************************/

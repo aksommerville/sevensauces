@@ -19,6 +19,7 @@ void sprite_hero_motion(struct sprite *sprite,int dx,int dy) {
   // Some items forbid direction change:
   switch (SPRITE->item_in_use) {
     case NS_item_grapple:
+    case NS_item_fishpole:
       return;
   }
   // Normal processing...

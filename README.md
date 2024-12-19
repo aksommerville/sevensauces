@@ -8,8 +8,8 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [x] Sword
 - [x] Try graphics with outline.
 - [x] Grapple
-- [ ] Fishpole
-- [ ] Letter
+- [x] Fishpole
+- [x] Letter
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Freshen tree and trap tiles. Lots are missing, and we have a bunch with no item anymore. And all look bad.
 - [ ] Sort sprites before render
@@ -29,6 +29,12 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
 - [ ] Pause: Show name and description of highlighted item. Importantly, the foodgroup and density.
 - [ ] Release grapple over water. What should happen? What we have is not ok.
+- [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
+- [ ] Fishing challenges:
+- - [ ] Parachute
+- - [ ] Machine gun
+- - [ ] Spell of darkness
+- - [ ] Cat
 
 ## Notes re starting over
 

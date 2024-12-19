@@ -22,6 +22,13 @@ static int _hero_init(struct sprite *sprite) {
 
 static void _hero_update(struct sprite *sprite,double elapsed) {
 
+  if (SPRITE->item_in_use==NS_item_fishpole) {
+    if ((SPRITE->animclock-=elapsed)<=0.0) {
+      hero_fishpole_ready(sprite);
+    }
+    return;
+  }
+
   if ((SPRITE->cursorclock-=elapsed)<0.0) {
     SPRITE->cursorclock+=0.200;
     if (++(SPRITE->cursorframe)>=4) SPRITE->cursorframe=0;
@@ -68,6 +75,33 @@ static inline int hero_item_is_wieldable(uint8_t itemid) {
 static void _hero_render(struct sprite *sprite,int16_t x,int16_t y) {
   const struct item *item=itemv+g.session->inventory[g.session->invp];
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  
+  // Fishpole deployed and animating? That's a whole different thing.
+  if (SPRITE->item_in_use==NS_item_fishpole) {
+    int linex=x,liney=y;
+    uint8_t tileid,xform=0;
+         if (SPRITE->facedx<0) { linex-=NS_sys_tilesize; tileid=0x0c; }
+    else if (SPRITE->facedx>0) { linex+=NS_sys_tilesize; tileid=0x0c; xform=EGG_XFORM_XREV; }
+    else if (SPRITE->facedy<0) { liney-=NS_sys_tilesize; tileid=0x09; }
+    else                       { liney+=NS_sys_tilesize; tileid=0x06; }
+    if (SPRITE->fish_outcome&&(SPRITE->animclock<0.500)) { // "oh!"
+      graf_draw_tile(&g.graf,texid,x,y,tileid+2,xform);
+      int16_t fishy=(int16_t)(liney-(0.500-SPRITE->animclock)*60.0);
+      uint8_t fishtile;
+           if (SPRITE->animclock>=0.350) fishtile=0x18;
+      else if (SPRITE->animclock>=0.200) fishtile=0x1b;
+      else if (SPRITE->animclock>=0.050) fishtile=0x18;
+      else                               fishtile=0x1e;
+      graf_draw_tile(&g.graf,texid,linex,fishy,fishtile,0);
+    } else {
+      double whole,fract;
+      fract=modf(SPRITE->animclock,&whole);
+      if (fract>=0.500) tileid++;
+      graf_draw_tile(&g.graf,texid,x,y,tileid,xform);
+      graf_draw_tile(&g.graf,texid,linex,liney,tileid+0x10,xform);
+    }
+    return;
+  }
   
   if (item->flags&(1<<NS_itemflag_cell)) {
     int col=-100,row=0;

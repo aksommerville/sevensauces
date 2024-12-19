@@ -28,6 +28,7 @@ struct sprite_hero {
   double animclock;
   int animframe;
   uint8_t item_in_use;
+  int fish_outcome; // We determine at the moment fishing begins, whether there will be a minigame or not.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -44,5 +45,6 @@ void hero_rejoin_motion(struct sprite *sprite);
 // hero_items.c
 int hero_drop_item(struct sprite *sprite,uint8_t itemid);
 void hero_update_item(struct sprite *sprite,double elapsed);
+void hero_fishpole_ready(struct sprite *sprite);
 
 #endif

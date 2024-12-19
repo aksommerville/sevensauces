@@ -43,7 +43,6 @@ static void hero_begin_sword(struct sprite *sprite) {
   SPRITE->item_in_use=NS_item_sword;
   SPRITE->walkdx=SPRITE->walkdy=0;
   egg_play_sound(RID_sound_sword);
-  //TODO Need an ongoing check while deployed, for injurable things.
 }
 
 static void hero_end_sword(struct sprite *sprite) {
@@ -86,8 +85,6 @@ static void hero_begin_grapple(struct sprite *sprite) {
   SPRITE->item_in_use=NS_item_grapple;
   SPRITE->walkdx=SPRITE->walkdy=0;
   egg_play_sound(RID_sound_grapple_start);
-  //TODO Arrange to notice when the grapple TTLs out.
-  //TODO Arrange to get updates from the grapple in general. (lift hero, retrieve item, ttl)
 }
 
 static void hero_end_grapple(struct sprite *sprite) {
@@ -115,37 +112,50 @@ void sprite_hero_release_grapple(struct sprite *sprite) {
 
 /* Fishpole.
  */
- 
-static void hero_cb_fishing(int result,void *userdata) {
-  if (result<1) return;
+
+static void hero_cb_fish_acquire(int invp,void *userdata) {
   struct sprite *sprite=userdata;
-  int inventoryp=session_get_free_inventory_slot(g.session);
-  if (inventoryp<0) return;
-  //g.session->inventory[inventoryp]=NS_item_fish;
+  if ((invp<0)||(invp>=16)) return; // Cancel, no worries.
+  uint8_t itemid_drop=g.session->inventory[invp];
+  if (!itemid_drop) return;
+  uint8_t itemid_take=NS_item_fish; // TODO Maybe there will be other fish items.
+  const struct item *item=itemv+itemid_take;
+  g.session->inventory[invp]=itemid_take;
+  hero_drop_item(sprite,itemid_drop);
+}
+ 
+static void hero_cb_fishing(int outcome,void *userdata) {
+  struct sprite *sprite=userdata;
+  if (outcome>0) {
+    int result=session_acquire_item(g.session,NS_item_fish,hero_cb_fish_acquire,sprite);
+  }
 }
  
 static void hero_begin_fishpole(struct sprite *sprite) {
-  /*TODO copied from 20241217
   int col=-123,row;
   hero_get_item_cell(&col,&row,sprite);
   if ((col<0)||(row<0)||(col>=g.world->map->w)||(row>=g.world->map->h)) {
-    // TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
   uint8_t physics=g.world->physics[tileid];
   if (physics!=NS_physics_water) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
-  //TODO I think we want some animation in place first.
-  // Show Dot holding the pole with line extending into the water, bump a little, see the fish fly up out of the water...
-  sprite_hero_end_motion(sprite,0,0);
-  struct layer *fishing=layer_spawn(&layer_type_fishing);
-  if (!fishing) return;
-  layer_fishing_setup(fishing,g.world,col,row,hero_cb_fishing,sprite);
-  /**/
+  SPRITE->item_in_use=NS_item_fishpole;
+  SPRITE->animclock=4.000;
+  SPRITE->fish_outcome=rand()&1;//TODO Decide whether there will be a fish, and which one. The animation plays out before we expose the decision.
+}
+
+void hero_fishpole_ready(struct sprite *sprite) {
+  SPRITE->item_in_use=0;
+  if (SPRITE->fish_outcome) {
+    struct layer *fishing=layer_spawn(&layer_type_fishing);
+    layer_fishing_setup(fishing,hero_cb_fishing,sprite);
+  }
 }
 
 /* Shovel.
@@ -289,6 +299,7 @@ static void hero_update_letter(struct sprite *sprite,double elapsed,uint8_t item
  */
 
 void sprite_hero_action(struct sprite *sprite) {
+  if (SPRITE->item_in_use) return;
   uint8_t itemid=g.session->inventory[g.session->invp];
   const struct item *item=itemv+itemid;
   switch (item->usage) {
