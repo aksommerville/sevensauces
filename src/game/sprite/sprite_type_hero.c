@@ -399,10 +399,10 @@ static void hero_end_sword(struct sprite *sprite) {
 static void hero_begin_bow(struct sprite *sprite) {
   double x=sprite->x,y=sprite->y;
   uint32_t arg;
-       if (SPRITE->facedx<0) { arg=0; y+=0.5; }
-  else if (SPRITE->facedx>0) { arg=1; y+=0.5; }
-  else if (SPRITE->facedy<0) { arg=2; }
-  else                       { arg=3; y+=0.5; }
+       if (SPRITE->facedx<0) { arg=0; x-=0.5; y+=0.5; }
+  else if (SPRITE->facedx>0) { arg=1; x+=0.5; y+=0.5; }
+  else if (SPRITE->facedy<0) { arg=2; y-=0.5; }
+  else                       { arg=3; y+=1.0; }
   struct sprite *arrow=sprite_new(&sprite_type_arrow,sprite->owner,x,y,arg,0);
   if (!arrow) return;
   egg_play_sound(RID_sound_arrow);

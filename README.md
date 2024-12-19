@@ -6,7 +6,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 - [x] World overlay
 - [x] Sword
-- [ ] Try graphics with outline.
+- [x] Try graphics with outline.
 - [ ] Grapple
 - [ ] Fishpole
 - [ ] Letter
