@@ -29,6 +29,8 @@ struct session {
     int mapid,x,y,itemid;
   } plantv[SESSION_PLANT_LIMIT];
   int plantc;
+  
+  int customerc;//TODO
 };
 
 void session_del(struct session *session);
@@ -47,6 +49,14 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
 
 struct plant *session_add_plant(struct session *session);
 void session_apply_plants(struct session *session);
+
+struct invsum {
+  int invc; // Count of items in inventory.
+  int vegc; // Helpings of vegetables (sum of densities).
+  int meatc; // '' meat
+  int candyc; // '' candy
+};
+void session_summarize_inventory(struct invsum *invsum,const struct session *session);
 
 struct item {
   uint8_t flags;

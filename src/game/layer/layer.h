@@ -84,6 +84,8 @@ extern const struct layer_type layer_type_kitchen;
 extern const struct layer_type layer_type_pause;
 extern const struct layer_type layer_type_toast;
 extern const struct layer_type layer_type_message;
+extern const struct layer_type layer_type_status;
+extern const struct layer_type layer_type_query;
 
 /* "global" is the regular pause menu. It can change the session's chosen slot, and can abort the session.
  * "query" takes an optional prompt and reports the chosen item to your callback, or <0 if cancelled.

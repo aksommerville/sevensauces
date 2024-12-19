@@ -36,6 +36,7 @@ static int _beginday_init(struct layer *layer) {
 static void beginday_proceed(struct layer *layer) {
   layer_pop(layer);
   layer_spawn(&layer_type_world);
+  layer_spawn(&layer_type_status);
 }
 
 static void _beginday_input(struct layer *layer,int input,int pvinput) {

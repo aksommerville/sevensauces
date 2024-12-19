@@ -4,12 +4,9 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [ ] Finish onboarding sprites copied from 20241217
-- - [x] Harvest
-- - [x] "drop" and "free" usages for hero.
-- [x] Fauna parameters.
-- [x] Make 'arrow' sprite work for stone too.
-- [ ] Sword
+- [x] World overlay
+- [x] Sword
+- [ ] Try graphics with outline.
 - [ ] Grapple
 - [ ] Fishpole
 - [ ] Letter

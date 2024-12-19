@@ -217,3 +217,22 @@ void session_apply_plants(struct session *session) {
     map->v[cellp]=ntileid;
   }
 }
+
+/* Summarize inventory.
+ */
+ 
+void session_summarize_inventory(struct invsum *invsum,const struct session *session) {
+  memset(invsum,0,sizeof(struct invsum));
+  const uint8_t *itemid=session->inventory;
+  int i=INVENTORY_SIZE;
+  for (;i-->0;itemid++) {
+    if (!*itemid) continue;
+    invsum->invc++;
+    const struct item *item=itemv+(*itemid);
+    switch (item->foodgroup) {
+      case NS_foodgroup_veg: invsum->vegc+=item->density; break;
+      case NS_foodgroup_meat: invsum->meatc+=item->density; break;
+      case NS_foodgroup_candy: invsum->candyc+=item->density; break;
+    }
+  }
+}

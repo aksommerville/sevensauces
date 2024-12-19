@@ -20,6 +20,9 @@ struct sprite_hero {
   int mapid,col,row; // Track cell for quantized actions like harvest.
   struct sprite *touchv[HERO_TOUCH_LIMIT]; // WEAK and possibly invalid. Confirm residency before dereferencing.
   int touchc;
+  double animclock;
+  int animframe;
+  uint8_t item_in_use;
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -178,6 +181,11 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     SPRITE->cursorclock+=0.200;
     if (++(SPRITE->cursorframe)>=4) SPRITE->cursorframe=0;
   }
+  
+  if ((SPRITE->animclock-=elapsed)<0.0) {
+    SPRITE->animclock+=0.200;
+    if (++(SPRITE->animframe)>=4) SPRITE->animframe=0;
+  }
 
   if (SPRITE->walkdx||SPRITE->walkdy) {
     const double walkspeed=6.0; // m/s
@@ -229,7 +237,23 @@ static void _hero_render(struct sprite *sprite,int16_t x,int16_t y) {
   else if (SPRITE->facedy<0) { sprite->tileid=0x01; sprite->xform=0; }
   else                       { sprite->tileid=0x00; sprite->xform=0; }
   
-  //TODO Update (tileid) per animation.
+  // Update (tileid) per action and animation, and draw other decorations. tileid currently 0, 1, or 2, depending on facedir.
+  if (SPRITE->item_in_use==NS_item_sword) {
+    sprite->tileid+=0x03;
+    int16_t swordx=x+SPRITE->facedx*NS_sys_tilesize;
+    int16_t swordy=y+SPRITE->facedy*NS_sys_tilesize;
+    uint8_t swordxform=0; // Natural orientation is down, and when horizontal, put the natural left edge at the bottom both ways.
+    if (SPRITE->facedx<0) swordxform=EGG_XFORM_SWAP|EGG_XFORM_XREV|EGG_XFORM_YREV;
+    else if (SPRITE->facedx>0) swordxform=EGG_XFORM_SWAP|EGG_XFORM_XREV;
+    else if (SPRITE->facedy<0) swordxform=EGG_XFORM_XREV|EGG_XFORM_YREV;
+    graf_draw_tile(&g.graf,texid,swordx,swordy,0x13,swordxform);
+    
+  } else if (SPRITE->walkdx||SPRITE->walkdy) {
+    switch (SPRITE->animframe) {
+      case 0: sprite->tileid+=0x10; break;
+      case 2: sprite->tileid+=0x20; break;
+    }
+  }
 
   graf_draw_tile(&g.graf,texid,x,y,sprite->tileid,sprite->xform);
 }
@@ -246,10 +270,25 @@ const struct sprite_type sprite_type_hero={
   .render=_hero_render,
 };
 
+/* Force animclock to show frame zero.
+ */
+ 
+static void hero_reset_animclock(struct sprite *sprite) {
+  SPRITE->animclock=0.200;
+  SPRITE->animframe=0;
+}
+
 /* Dpad events.
  */
  
 void sprite_hero_motion(struct sprite *sprite,int dx,int dy) {
+  // Some items forbid direction change:
+  switch (SPRITE->item_in_use) {
+    case NS_item_grapple:
+      return;
+  }
+  // Normal processing...
+  if (!SPRITE->walkdx&&!SPRITE->walkdy) hero_reset_animclock(sprite);
   if (dx) {
     SPRITE->walkdx=dx;
     SPRITE->facedx=dx;
@@ -258,6 +297,14 @@ void sprite_hero_motion(struct sprite *sprite,int dx,int dy) {
     SPRITE->walkdy=dy;
     SPRITE->facedx=0;
     SPRITE->facedy=dy;
+  }
+  // Some items allow direction change, but not motion:
+  switch (SPRITE->item_in_use) {
+    case NS_item_sword:
+    case NS_item_apology:
+    case NS_item_loveletter:
+      SPRITE->walkdx=SPRITE->walkdy=0;
+      break;
   }
 }
 
@@ -284,6 +331,20 @@ void sprite_hero_end_motion(struct sprite *sprite,int dx,int dy) {
         SPRITE->facedy=0;
       }
     }
+  }
+}
+
+// At the end of an item usage which was preventing motion, poll input and resume motion if dpad held.
+// We cheat and ask Egg directly for the input state.
+static void hero_rejoin_motion(struct sprite *sprite) {
+  int input=egg_input_get_one(0);
+  switch (input&(EGG_BTN_LEFT|EGG_BTN_RIGHT)) {
+    case EGG_BTN_LEFT: sprite_hero_motion(sprite,-1,0); break;
+    case EGG_BTN_RIGHT: sprite_hero_motion(sprite,1,0); break;
+  }
+  switch (input&(EGG_BTN_UP|EGG_BTN_DOWN)) {
+    case EGG_BTN_UP: sprite_hero_motion(sprite,0,-1); break;
+    case EGG_BTN_DOWN: sprite_hero_motion(sprite,0,1); break;
   }
 }
 
@@ -322,7 +383,14 @@ static void hero_free_faun(struct sprite *sprite,uint8_t itemid) {
  */
  
 static void hero_begin_sword(struct sprite *sprite) {
-  fprintf(stderr,"TODO %s\n",__func__);
+  SPRITE->item_in_use=NS_item_sword;
+  SPRITE->walkdx=SPRITE->walkdy=0;
+  //TODO Need an ongoing check while deployed, for injurable things.
+}
+
+static void hero_end_sword(struct sprite *sprite) {
+  SPRITE->item_in_use=0;
+  hero_rejoin_motion(sprite);
 }
 
 /* Bow.
@@ -345,6 +413,9 @@ static void hero_begin_bow(struct sprite *sprite) {
  
 static void hero_begin_grapple(struct sprite *sprite) {
   fprintf(stderr,"TODO %s\n",__func__);
+}
+
+static void hero_end_grapple(struct sprite *sprite) {
 }
 
 /* Fishpole.
@@ -504,8 +575,11 @@ static void hero_begin_stone(struct sprite *sprite) {
 /* Letter (both Apology and Love Letter).
  */
  
-static void hero_begin_letter(struct sprite *sprite) {
+static void hero_begin_letter(struct sprite *sprite,uint8_t itemid) {
   fprintf(stderr,"TODO %s\n",__func__);
+}
+
+static void hero_end_letter(struct sprite *sprite) {
 }
 
 /* Begin action.
@@ -524,7 +598,7 @@ void sprite_hero_action(struct sprite *sprite) {
     case NS_itemusage_shovel: hero_begin_shovel(sprite); break;
     case NS_itemusage_trap: hero_begin_trap(sprite); break;
     case NS_itemusage_stone: hero_begin_stone(sprite); break;
-    case NS_itemusage_letter: hero_begin_letter(sprite); break;
+    case NS_itemusage_letter: hero_begin_letter(sprite,itemid); break;
     default: {
         fprintf(stderr,"no usage for item 0x%02x\n",itemid);
         //TODO sound effect: No item, or no use for this one.
@@ -537,4 +611,10 @@ void sprite_hero_action(struct sprite *sprite) {
  */
 
 void sprite_hero_end_action(struct sprite *sprite) {
+  switch (SPRITE->item_in_use) {
+    case NS_item_sword: hero_end_sword(sprite); break;
+    case NS_item_grapple: hero_end_grapple(sprite); break;
+    case NS_item_apology: hero_end_letter(sprite); break;
+    case NS_item_loveletter: hero_end_letter(sprite); break;
+  }
 }
