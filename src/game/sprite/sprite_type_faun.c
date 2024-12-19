@@ -29,6 +29,7 @@ struct sprite_faun {
   double wait_clock;
   double dx,dy;
   int col,row;
+  struct sprite *paralyzer; // WEAK
 };
 
 #define SPRITE ((struct sprite_faun*)sprite)
@@ -335,6 +336,10 @@ static void faun_check_traps(struct sprite *sprite) {
  
 static void _faun_update(struct sprite *sprite,double elapsed) {
 
+  if (SPRITE->paralyzer) {
+    return;
+  }
+
   /* We need the hero's distance every time, for spooking and capture tracking.
    */
   double hero_d2=999.0;
@@ -401,6 +406,14 @@ static void _faun_update(struct sprite *sprite,double elapsed) {
   faun_check_traps(sprite);
 }
 
+/* Paralyze.
+ */
+ 
+static void _faun_paralyze(struct sprite *sprite,struct sprite *controller) {
+  faun_chill(sprite);
+  SPRITE->paralyzer=controller;
+}
+
 /* Type definition.
  */
  
@@ -409,4 +422,5 @@ const struct sprite_type sprite_type_faun={
   .objlen=sizeof(struct sprite_faun),
   .init=_faun_init,
   .update=_faun_update,
+  .paralyze=_faun_paralyze,
 };

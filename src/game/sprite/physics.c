@@ -27,7 +27,8 @@ int sprite_rectify_physics(struct sprite *sprite) {
   if (col>g.world->map->w-2) col=g.world->map->w-2;
   if (row>g.world->map->h-2) row=g.world->map->h-2;
   const uint8_t *cellv=g.world->map->v+row*g.world->map->w+col;
-  uint8_t solidmask=(1<<NS_physics_solid)|(1<<NS_physics_water);
+  //TODO Need a more refined sense of which physics values are impassable. Will become important if we implement a broom.
+  uint8_t solidmask=(1<<NS_physics_solid)|(1<<NS_physics_water)|(1<<NS_physics_grapplable);
   uint8_t hits=( // 8,4,2,1=NW,NE,SW,SE
     (((1<<g.world->physics[cellv[0]])&solidmask)?8:0)|
     (((1<<g.world->physics[cellv[1]])&solidmask)?4:0)|

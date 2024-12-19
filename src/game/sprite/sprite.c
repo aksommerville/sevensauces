@@ -53,6 +53,7 @@ static int sprite_run_initial_commands(struct sprite *sprite) {
     #define u16(p) ((cmd.argv[p]<<8)|cmd.argv[(p)+1])
     #define u32(p) ((cmd.argv[p]<<24)|(cmd.argv[(p)+1]<<16)|(cmd.argv[(p)+2]<<8)|cmd.argv[(p)+3])
     switch (cmd.opcode) {
+      case CMD_sprite_grapplable: sprite->grapplable=1; break;
       case CMD_sprite_image: sprite->imageid=u16(0); break;
       case CMD_sprite_tile: sprite->tileid=u8(0); sprite->xform=u8(1); break;
     }

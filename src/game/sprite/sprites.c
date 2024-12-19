@@ -189,9 +189,7 @@ void sprites_render(struct sprites *sprites) {
   int i=0; for (;i<sprites->c;i++) {
     struct sprite *sprite=sprites->v[i];
     int x=(int)(sprite->x*NS_sys_tilesize)-g.world->viewx;
-    if ((x<xlo)||(x>xhi)) continue;
     int y=(int)(sprite->y*NS_sys_tilesize)-g.world->viewy;
-    if ((y<ylo)||(y>yhi)) continue;
     
     if (sprite->type->render) {
       graf_flush(&g.graf); // Flushing is wise, in case the sprite's renderer invalidates texcache.
@@ -199,6 +197,10 @@ void sprites_render(struct sprites *sprites) {
       texid=imageid=0; // Assume that texcache has gone stale.
       
     } else {
+      // Generic culling is only for single-tile sprites. Customer renderers might cover a very broad area (eg grapple).
+      if ((x<xlo)||(x>xhi)) continue;
+      if ((y<ylo)||(y>yhi)) continue;
+    
       if (sprite->imageid!=imageid) {
         imageid=sprite->imageid;
         texid=texcache_get_image(&g.texcache,sprite->imageid);
@@ -227,7 +229,9 @@ void sprites_find_spawn_position(double *x,double *y,const struct sprites *sprit
         switch (physics) {
           case NS_physics_solid:
           case NS_physics_water:
-          case NS_physics_harvest: goto _not_here_;
+          case NS_physics_harvest:
+          case NS_physics_grapplable:
+            goto _not_here_;
           // harvest is passable of course, but it's awkward to have sprites on top of one.
         }
       }
@@ -267,6 +271,7 @@ void sprites_find_spawn_position(double *x,double *y,const struct sprites *sprit
         case NS_physics_solid:
         case NS_physics_water:
         case NS_physics_harvest:
+        case NS_physics_grapplable:
           continue;
       }
       candidatev[candidatec++]=(struct candidate){col+coli,row+rowi};

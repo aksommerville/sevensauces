@@ -67,6 +67,7 @@ struct sprite {
   double x,y; // Center of sprite, in world cells.
   int imageid; // For generic render.
   uint8_t tileid,xform; // For generic render.
+  int grapplable;
 };
 
 /* Deletes the sprite immediately and unlists from its owner.
@@ -114,8 +115,16 @@ struct sprite_type {
   void (*update)(struct sprite *sprite,double elapsed);
   void (*hero_touch)(struct sprite *sprite,struct sprite *hero);
   
+  /* Sprites that move on their own and are subject to the grapple must implement this.
+   * When you have a non-null controller, don't move.
+   * It's currently not possible for two controllers to contend over one paralyzee.
+   * If that comes up in the future, it will need dealt with.
+   */
+  void (*paralyze)(struct sprite *sprite,struct sprite *controller);
+  
   /* Implement (render) only if a single tile won't suffice.
    * (x,y) are (sprite->x,y) in framebuffer pixels.
+   * If implemented, the usual culling will not happen, you'll be called every frame, possibly with a very OOB (x,y).
    */
   void (*render)(struct sprite *sprite,int16_t x,int16_t y);
 };
@@ -131,6 +140,8 @@ void sprite_hero_motion(struct sprite *sprite,int dx,int dy);
 void sprite_hero_end_motion(struct sprite *sprite,int dx,int dy);
 void sprite_hero_action(struct sprite *sprite);
 void sprite_hero_end_action(struct sprite *sprite);
+void sprite_hero_engage_grapple(struct sprite *sprite);
+void sprite_hero_release_grapple(struct sprite *sprite);
 
 void sprite_item_no_blackout(struct sprite *sprite);
 
@@ -138,5 +149,8 @@ void sprite_item_no_blackout(struct sprite *sprite);
 // If you're not going to change tileid, you can manually drop all dazes for a given master too.
 void sprite_daze_setup(struct sprite *sprite,struct sprite *master);
 void sprite_daze_drop_for_master(struct sprites *sprites,struct sprite *master);
+
+void sprite_grapple_setup(struct sprite *sprite,int dx,int dy);
+void sprite_grapple_drop_all(struct sprites *sprites);
  
 #endif

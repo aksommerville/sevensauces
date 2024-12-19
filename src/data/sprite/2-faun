@@ -1,3 +1,4 @@
 type (u16:spritetype)faun
 image image:item
 tile 0xff 0
+grapplable

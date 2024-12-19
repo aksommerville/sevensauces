@@ -18,9 +18,10 @@
 #define CMD_map_sprite     0x61 /* u16:pos u16:spriteid u32:reserved */
 #define CMD_map_door       0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
 
-#define CMD_sprite_image  0x20 /* u16:imageid */
-#define CMD_sprite_tile   0x21 /* u8:tileid u8:xform */
-#define CMD_sprite_type   0x22 /* u16:spritetype */
+#define CMD_sprite_grapplable 0x01 /* --- */
+#define CMD_sprite_image      0x20 /* u16:imageid */
+#define CMD_sprite_tile       0x21 /* u8:tileid u8:xform */
+#define CMD_sprite_type       0x22 /* u16:spritetype */
 
 #define NS_tilesheet_physics     1
 #define NS_tilesheet_neighbors   0
@@ -35,6 +36,7 @@
 #define NS_physics_diggable 4
 #define NS_physics_trap 5
 #define NS_physics_seed 6
+#define NS_physics_grapplable 7 /* Same as 'solid' but the grapple can grap it. */
 
 #define NS_spritetype_dummy     0
 #define NS_spritetype_hero      1
@@ -42,13 +44,15 @@
 #define NS_spritetype_arrow     3
 #define NS_spritetype_daze      5
 #define NS_spritetype_faun      6
+#define NS_spritetype_grapple   7
 #define FOR_EACH_SPRITE_TYPE \
   _(dummy) \
   _(hero) \
   _(item) \
   _(arrow) \
   _(daze) \
-  _(faun)
+  _(faun) \
+  _(grapple)
   
 #define NS_foodgroup_inedible 0
 #define NS_foodgroup_poison   1

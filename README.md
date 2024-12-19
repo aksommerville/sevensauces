@@ -7,7 +7,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [x] World overlay
 - [x] Sword
 - [x] Try graphics with outline.
-- [ ] Grapple
+- [x] Grapple
 - [ ] Fishpole
 - [ ] Letter
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
@@ -18,6 +18,17 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Condensery
 - [ ] Kitchen
+- [ ] Should we give Dot some of her Full Moon toys too?
+- - YES: Broom, Umbrella, Bell
+- - NO: Chalk, Violin, Hat, Feather, Pitcher
+- - ALREADY DONE: Shovel, Seeds, Cheese, Gold
+- - MAYBE: Wand, Snowglobe, Matches, Compass.
+- - - Wand wouldn't be for casting spells; it would just be a weapon.
+- - - Matches probably not, since we don't (and won't) have item quantities.
+- - - Compass probably not, there's no buried treasure and no place for narrative guidance.
+- [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
+- [ ] Pause: Show name and description of highlighted item. Importantly, the foodgroup and density.
+- [ ] Release grapple over water. What should happen? What we have is not ok.
 
 ## Notes re starting over
 
