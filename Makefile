@@ -16,7 +16,9 @@ endif
 # Let eggdev configure us.
 include mid/eggcfg
 mid/eggcfg:;$(PRECMD) ( $(EGG_SDK)/out/eggdev config > $@ ) || ( rm -f $@ ; exit 1 )
-WEB_CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DIMAGE_ENABLE_ENCODERS=0 -DIMAGE_USE_PNG=0
+ifneq (,$(WEB_CC))
+  WEB_CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DIMAGE_ENABLE_ENCODERS=0 -DIMAGE_USE_PNG=0
+endif
 CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DUSE_REAL_STDLIB=1
 
 SRCFILES:=$(shell find src -type f)
@@ -29,20 +31,24 @@ TOC_H:=mid/egg_rom_toc.h
 DATADIRS:=$(shell find src/data -type d)
 $(TOC_H):$(DATADIRS);$(PRECMD) $(EGG_SDK)/out/eggdev list src/data -ftoc > $@
 
-WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(CFILES)) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
--include $(WEB_OFILES:.o=.d)
-mid/web/%.o:src/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
-mid/web/%.o:$(EGG_SDK)/src/opt/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
-WEB_LIB:=mid/web/code.wasm
-$(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
+ifneq (,$(WEB_CC))
+  WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(CFILES)) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
+  -include $(WEB_OFILES:.o=.d)
+  mid/web/%.o:src/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
+  mid/web/%.o:$(EGG_SDK)/src/opt/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
+  WEB_LIB:=mid/web/code.wasm
+  $(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
+endif
 
 ROM:=out/sevensauces.egg
 all:$(ROM)
 $(ROM):$(WEB_LIB) $(DATAFILES);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data --schema=src/game/shared_symbols.h
 
-HTML:=out/sevensauces.html
-all:$(HTML)
-$(HTML):$(ROM);$(PRECMD) $(EGG_SDK)/out/eggdev bundle -o$@ $(ROM)
+ifneq (,$(WEB_CC))
+  HTML:=out/sevensauces.html
+  all:$(HTML)
+  $(HTML):$(ROM);$(PRECMD) $(EGG_SDK)/out/eggdev bundle -o$@ $(ROM)
+endif
 
 ifneq (,$(strip $(NATIVE_TARGET)))
   NATIVE_OPT_CFILES:=$(filter-out $(EGG_SDK)/src/opt/stdlib/%,$(OPT_CFILES))
@@ -76,5 +82,18 @@ edit:;$(EGG_SDK)/out/eggdev serve \
   --write=src $(EDIT_AUDIO_ARGS)
 
 web-run:$(ROM);$(EGG_SDK)/out/eggdev serve --htdocs=$(EGG_SDK)/src/www --htdocs=out --default-rom=/$(notdir $(ROM))
+
+ifeq ($(NATIVE_TARGET),macos)
+  BUNDLE:=out/SevenSauces.app
+  BUNDLE_EXE:=$(BUNDLE)/Contents/MacOS/sevensauces
+  BUNDLE_PLIST:=$(BUNDLE)/Contents/Info.plist
+  BUNDLE_NIB:=$(BUNDLE)/Contents/Resources/Main.nib
+  #TODO icons
+  $(BUNDLE_EXE):$(NATIVE_EXE);$(PRECMD) cp $< $@
+  $(BUNDLE_PLIST):$(EGG_SDK)/src/opt/macos/Info.plist $(EGG_SDK)/etc/tool/plist.sh; \
+    $(PRECMD) $(EGG_SDK)/etc/tool/plist.sh $(EGG_SDK)/src/opt/macos/Info.plist src/data/metadata sevensauces com.aksommerville.sevensauces > $@
+  $(BUNDLE_NIB):$(EGG_SDK)/src/opt/macos/Main.xib;$(PRECMD) ibtool --compile $@ $<
+  all:$(BUNDLE_EXE) $(BUNDLE_PLIST) $(BUNDLE_NIB)
+endif
 
 endif
