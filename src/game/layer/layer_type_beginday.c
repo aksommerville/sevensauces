@@ -30,6 +30,8 @@ static int _beginday_init(struct layer *layer) {
   LAYER->texid=font_texres_oneline(g.font,RID_strings_ui,6+g.session->day,FBW,0xffffffff);
   egg_texture_get_status(&LAYER->texw,&LAYER->texh,LAYER->texid);
   
+  egg_play_song(0,0,1);
+  
   return 0;
 }
 

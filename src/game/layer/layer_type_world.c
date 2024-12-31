@@ -19,6 +19,7 @@ static void _lw_del(struct layer *layer) {
 
 static int _lw_init(struct layer *layer) {
   if (!g.world) return -1;
+  egg_play_song(RID_song_overflowing_basket,0,1);
   return 0;
 }
 

@@ -47,6 +47,8 @@ static int _hello_init(struct layer *layer) {
   widget_decal_spawn_string(LAYER->menu,FBW>>1,130,0,RID_strings_ui,3,FBW,0xffffffff,hello_cb_credits,layer);
   widget_decal_spawn_string(LAYER->menu,FBW>>1,145,0,RID_strings_ui,4,FBW,0xffffffff,hello_cb_quit,layer);
   
+  egg_play_song(0,0,1);
+  
   return 0;
 }
 

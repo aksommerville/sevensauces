@@ -49,6 +49,9 @@ static int _kitchen_init(struct layer *layer) {
   if (!widget) return -1;
   widget->accept_focus=0;
   //TODO populate menu
+  
+  egg_play_song(RID_song_goddess_of_night,0,1);
+  
   return 0;
 }
 
