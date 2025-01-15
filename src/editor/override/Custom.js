@@ -4,9 +4,10 @@
  
 export class Custom {
   static getDependencies() {
-    return [];
+    return [Document];
   }
-  constructor() {
+  constructor(document) {
+    this.document = document;
   }
   
   /* Return an array of {
@@ -35,6 +36,24 @@ export class Custom {
    */
   getEditors() {
     return [];
+  }
+  
+  /* To get custom point commands appearing in MapEditor instead of the "?" tile,
+   * pick off your interesting annotations (usually by annotiation.opcode), and return a Canvas or Image.
+   */
+  renderMapEditorAnnotation(annotation, command, map) {
+    switch (annotation.opcode) {
+      case "hero": {
+          const canvas = this.document.createElement("CANVAS");
+          canvas.width = 16;
+          canvas.height = 16;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#00f";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          return canvas;
+        };
+    }
+    return null;
   }
 }
 
