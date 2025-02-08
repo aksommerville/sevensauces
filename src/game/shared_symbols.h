@@ -123,5 +123,6 @@
 #define NS_item_loveletter     0x66
 #define NS_item_trap           0x67
 #define NS_item_grapple        0x68
+#define NS_item_arsenic        0x80
 
 #endif

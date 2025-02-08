@@ -50,4 +50,6 @@ const struct item itemv[256]={
   [NS_item_loveletter]={VALID,0,0,NS_itemusage_letter  ,0},
   [NS_item_trap      ]={CELL ,0,0,NS_itemusage_trap    ,0},
   [NS_item_grapple   ]={VALID,0,0,NS_itemusage_grapple ,0},
+  
+  [NS_item_arsenic]={VALID,NS_foodgroup_poison,1,NS_itemusage_drop,0},
 };

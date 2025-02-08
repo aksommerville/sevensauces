@@ -27,7 +27,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - - Matches probably not, since we don't (and won't) have item quantities.
 - - - Compass probably not, there's no buried treasure and no place for narrative guidance.
 - [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
-- [ ] Pause: Show name and description of highlighted item. Importantly, the foodgroup and density.
+- [x] Pause: Show name and description of highlighted item. Importantly, the foodgroup and density.
 - [ ] Release grapple over water. What should happen? What we have is not ok.
 - [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
 - [ ] Fishing challenges:

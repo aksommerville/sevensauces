@@ -24,6 +24,10 @@ int egg_client_init() {
   if (!(g.font=font_new())) return -1;
   if (font_add_image_resource(g.font,0x0020,RID_image_font9_0020)<0) return -1;
   
+  if (!(g.font6=font_new())) return -1;
+  if (font_add_image_resource(g.font6,0x0020,RID_image_font6_0020)<0) return -1;
+  //TODO We'll also need Latin-1 and Cyrillic for both fonts. And whatever else we can translate to... Japanese? Telugu?
+  
   srand_auto();
   
   if (!layer_spawn(&layer_type_hello)) return -1;
@@ -99,7 +103,6 @@ int sauces_res_get(void *dstpp,int tid,int rid) {
 
 /* Format string, replacing '%' with an item name.
  */
- 
 
 int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid) {
   const char *name=0,*fmt=0;

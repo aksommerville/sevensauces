@@ -64,7 +64,7 @@ sprite @12,18 sprite:item (u8:item)gumdrop 0x000000
 sprite @13,18 sprite:item (u8:item)peppermint 0x000000
 sprite @14,18 sprite:item (u8:item)licorice 0x000000
 sprite @15,19 sprite:item (u8:item)chocolate 0x000000
-sprite @2,24 sprite:item (u8:item)fish 0x000000
+sprite @2,25 sprite:item (u8:item)arsenic 0x000000
 sprite @6,10 sprite:item (u8:item)buckeye 0x000000
 sprite @7,10 sprite:item (u8:item)applepie 0x000000
 sprite @8,10 sprite:item (u8:item)birthdaycake 0x000000
@@ -86,3 +86,4 @@ sprite @21,18 sprite:item (u8:item)trap 0x000000
 sprite @21,19 sprite:item (u8:item)trap 0x000000
 sprite @21,20 sprite:item (u8:item)trap 0x000000
 home @10,26
+sprite @2,24 sprite:item (u8:item)fish 0x000000
