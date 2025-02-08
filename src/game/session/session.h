@@ -50,6 +50,8 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
 struct plant *session_add_plant(struct session *session);
 void session_apply_plants(struct session *session);
 
+/* Veg, meat, and candy counts include the sauce count divided by 3 -- sauce counts as all 3 groups.
+ */
 struct invsum {
   int invc; // Count of items in inventory.
   int vegc; // Helpings of vegetables (sum of densities).

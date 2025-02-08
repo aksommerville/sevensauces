@@ -59,6 +59,7 @@
 #define NS_foodgroup_veg      2
 #define NS_foodgroup_meat     3
 #define NS_foodgroup_candy    4
+#define NS_foodgroup_sauce    5
 
 #define NS_itemflag_valid 0 /* This flag doesn't mean anything, but a full-zero flags byte means "unused". */
 #define NS_itemflag_cell  1 /* Hero should highlight the operative cell when armed. */
@@ -123,6 +124,13 @@
 #define NS_item_loveletter     0x66
 #define NS_item_trap           0x67
 #define NS_item_grapple        0x68
-#define NS_item_arsenic        0x80
+#define NS_item_arsenic        0x80 /* Poisons and other condiments... */
+#define NS_item_sunsauce       0x81
+#define NS_item_brightsauce    0x82
+#define NS_item_royaljelly     0x83
+#define NS_item_flashsauce     0x84
+#define NS_item_heavysauce     0x85
+#define NS_item_fragilesauce   0x86
+#define NS_item_forbidden      0x87
 
 #endif

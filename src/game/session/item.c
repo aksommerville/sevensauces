@@ -51,5 +51,12 @@ const struct item itemv[256]={
   [NS_item_trap      ]={CELL ,0,0,NS_itemusage_trap    ,0},
   [NS_item_grapple   ]={VALID,0,0,NS_itemusage_grapple ,0},
   
-  [NS_item_arsenic]={VALID,NS_foodgroup_poison,1,NS_itemusage_drop,0},
+  [NS_item_arsenic     ]={VALID,NS_foodgroup_poison,  1,NS_itemusage_drop,0},
+  [NS_item_sunsauce    ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_brightsauce ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_royaljelly  ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_flashsauce  ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_heavysauce  ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_fragilesauce]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
+  [NS_item_forbidden   ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
 };

@@ -246,6 +246,7 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
       case NS_foodgroup_candy: show_density=1; COLOR(5) break;
       case NS_foodgroup_inedible: COLOR(6) break;
       case NS_foodgroup_poison: COLOR(7) break;
+      case NS_foodgroup_sauce: show_density=1; COLOR(8) break;
     }
     const int foodgroup_strings_base=0;
     if ((srcc=strings_get(&src,RID_strings_item_errata,foodgroup_strings_base+item->foodgroup))>0) {
@@ -268,7 +269,7 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
   #undef APPENDLN
   #undef COLOR
   
-  const uint32_t colorv[8]={
+  const uint32_t colorv[10]={
     0xffffffff, // Default, not used.
     0xffff00ff, // Item name.
     0xa0c0e0ff, // Description.
@@ -277,6 +278,8 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
     0x00ffffff, // Candy.
     0xa0a0a0ff, // Inedible.
     0xff4030ff, // Poison.
+    0xffc0ffff, // Sauce.
+    0, // Reserved.
   };
   struct font_line linev[32];
   int linec=font_break_lines(linev,sizeof(linev)/sizeof(linev[0]),g.font6,text,textc,LAYER->descw);
@@ -291,7 +294,7 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
   for (;i-->0;line++,y+=7) {
     if ((line->c>=2)&&(line->v[0]==0x7f)) {
       int ix=line->v[1]-'0';
-      if ((ix>=0)&&(ix<8)) color=colorv[ix];
+      if ((ix>=0)&&(ix<10)) color=colorv[ix];
       line->v+=2;
       line->c-=2;
     }

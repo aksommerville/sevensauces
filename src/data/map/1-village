@@ -76,7 +76,7 @@ sprite @13,8 sprite:item (u8:item)sword 0x000000
 sprite @14,8 sprite:item (u8:item)stone 0x000000
 sprite @15,8 sprite:item (u8:item)apology 0x000000
 sprite @18,11 sprite:item (u8:item)loveletter 0x000000
-sprite @21,21 sprite:item (u8:item)trap 0x000000
+sprite @25,34 sprite:item (u8:item)forbidden 0x000000
 sprite @16,20 sprite:item (u8:item)butterscotch 0x000000
 sprite @16,11 sprite:item (u8:item)grapple 0x000000
 sprite @21,15 sprite:item (u8:item)trap 0x000000
@@ -87,3 +87,10 @@ sprite @21,19 sprite:item (u8:item)trap 0x000000
 sprite @21,20 sprite:item (u8:item)trap 0x000000
 home @10,26
 sprite @2,24 sprite:item (u8:item)fish 0x000000
+sprite @21,21 sprite:item (u8:item)trap 0x000000
+sprite @24,32 sprite:item (u8:item)sunsauce 0x000000
+sprite @25,32 sprite:item (u8:item)brightsauce 0x000000
+sprite @26,32 sprite:item (u8:item)royaljelly 0x000000
+sprite @26,33 sprite:item (u8:item)fragilesauce 0x000000
+sprite @25,33 sprite:item (u8:item)heavysauce 0x000000
+sprite @24,33 sprite:item (u8:item)flashsauce 0x000000

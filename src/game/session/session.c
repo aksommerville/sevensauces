@@ -225,6 +225,7 @@ void session_summarize_inventory(struct invsum *invsum,const struct session *ses
   memset(invsum,0,sizeof(struct invsum));
   const uint8_t *itemid=session->inventory;
   int i=INVENTORY_SIZE;
+  int saucec=0;
   for (;i-->0;itemid++) {
     if (!*itemid) continue;
     invsum->invc++;
@@ -233,6 +234,13 @@ void session_summarize_inventory(struct invsum *invsum,const struct session *ses
       case NS_foodgroup_veg: invsum->vegc+=item->density; break;
       case NS_foodgroup_meat: invsum->meatc+=item->density; break;
       case NS_foodgroup_candy: invsum->candyc+=item->density; break;
+      case NS_foodgroup_sauce: saucec+=item->density; break;
     }
+  }
+  if (saucec) {
+    saucec/=3; // Sauce densities will always be a multiple of 3.
+    invsum->vegc+=saucec;
+    invsum->meatc+=saucec;
+    invsum->candyc+=saucec;
   }
 }
