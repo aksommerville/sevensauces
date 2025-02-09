@@ -18,6 +18,13 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Condensery
 - [ ] Kitchen
+- - [ ] Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
+- - [x] Technical stew content: Show count of helpings, both total and per food group.
+- - [x] Details of focussed ingredient.
+- - [ ] Advice.
+- - [ ] Require confirmation at Ready for obviously incorrect stews? Eg no ingredients, or poison included.
+- - [ ] Animate delivery. ...punt this, maybe we don't need it, if there's going to be a separate daily-wrap-up modal.
+- - [ ] Separate scoreboard sequence after delivery.
 - [ ] Should we give Dot some of her Full Moon toys too?
 - - YES: Broom, Umbrella, Bell
 - - NO: Chalk, Violin, Hat, Feather, Pitcher
@@ -35,11 +42,13 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Machine gun
 - - [ ] Spell of darkness
 - - [ ] Cat
-- [ ] Bring in existing music:
+- [x] Bring in existing music:
 - - candy_apple
 - - watcher_of_pots
 - - bowlful_of_moonlight
 - - doors_open_at_sundown
+- [ ] An eighth bonus quest: Rescue the Princess. No sauce for winning, but the Princess will show up as a customer.
+- - That way, we have a max of 320 instead of 319 -- exactly the capacity we can render.
 
 ## Notes re starting over
 
@@ -88,15 +97,19 @@ Food groups:
 - - 25: Wedding cake
 
 And then of course there's the Secret Sauces. These should be in their own food group, with density always a multiple of 3, and apply equally to all 3 groups.
+Also Poison is technically a food group. It overrides everything except gross quantity: If any Poison was present, anybody that eats it dies.
+TODO: Would there ever be a reason to actually use Poison? Nothing springs to mind.
+Maybe perishable things like Fish turn into Poison if they linger in inventory too long?
 
 Customers:
 - Man: Satisfied if both veg and meat are present. Ecstatic if veg, meat, and candy are within a certain threshold of each other.
-- Elf: Satisfied if veg>meat. Ecstatic if all veg are different.
-- Leprechaun: Satisfied if candy present. Ecstatic if candy>veg and candy>meat.
+- Rabbit: Satisfied if veg>=meat. Ecstatic if all veg are different.
+- Octopus: Satisfied if candy present. Ecstatic if candy>veg and candy>meat.
 - Werewolf: Satisfied if anything present. Ecstatic if portions exceed population.
 
-XXX Elf and Leprechaun look too much like Man, and way too much like each other.
-Use Rabbit and Octopus instead. Octopus eats candy, right?
+There's another race called Princess.
+I'm planning for there to be just one Princess, a side quest where you have to rescue her.
+Because she's the reward for the side quest, she's super easy to please: Always satisfied as long as she's fed and not poisoned.
 
 A consequence of this approach is that all customers of a given class will react the same way every time.
 Is that desirable?
@@ -105,8 +118,12 @@ I think so. The game has to be playable, right? So the player can look at her ca
 ^ Dissatisfied customers should appear in the field the next day, and you can give them an Apology Card to bring them back, one at a time.
 
 Ingredients go up to 25 servings, and the cauldron holds 15, so we have a capacity of 375.
+UPDATE: The Secret Sauces are each worth 126. So in theory the richest stew is 1107 helpings. We should add a bonus for going over 1k, which will be nearly impossible.
 Start with 4 customers, one of each race.
 After each night, each customer can duplicate, plus one of random race if everybody is satisfied.
 Maximum count by day: 4, 9, 19, 39, 79, 159, 319, (639).
 The most real customers you could have is 319, and the most for scoring purposes is 639 (including additions Sunday evening).
 `2**n*5-1` from zero, if we need a straight formula.
+
+The limit for each food group appears to be 519 (7 sauces, ie `7*42 + 25*9`).
+It won't necessarily be possible to get 9 of the 25-point ingredients (eg I'm picturing Wedding Cake can only be got once per day).

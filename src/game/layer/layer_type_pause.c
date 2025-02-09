@@ -227,60 +227,7 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
    * Lines may begin U+7f followed by '0'..'7' to select a color.
    */
   char text[1024];
-  int textc=0;
-  #define APPEND(src,srcc) { if (textc<=sizeof(text)-(srcc)) { memcpy(text+textc,src,srcc); textc+=srcc; } }
-  #define APPENDLN(src,srcc) { if (textc<sizeof(text)-(srcc)) { memcpy(text+textc,src,srcc); textc+=srcc; text[textc++]=0x0a; } }
-  #define COLOR(ix) { if (textc<=sizeof(text)-2) { text[textc++]=0x7f; text[textc++]='0'+(ix); } }
-  if (itemid>0) { // Technically zero is an item, but it's the "no item" item.
-    const struct item *item=itemv+itemid;
-    const char *src=0;
-    int srcc=strings_get(&src,RID_strings_item_name,itemid); // Item name.
-    if (srcc>0) {
-      COLOR(1)
-      APPENDLN(src,srcc)
-    }
-    int show_density=0;
-    switch (item->foodgroup) {
-      case NS_foodgroup_veg: show_density=1; COLOR(3) break;
-      case NS_foodgroup_meat: show_density=1; COLOR(4) break;
-      case NS_foodgroup_candy: show_density=1; COLOR(5) break;
-      case NS_foodgroup_inedible: COLOR(6) break;
-      case NS_foodgroup_poison: COLOR(7) break;
-      case NS_foodgroup_sauce: show_density=1; COLOR(8) break;
-    }
-    const int foodgroup_strings_base=0;
-    if ((srcc=strings_get(&src,RID_strings_item_errata,foodgroup_strings_base+item->foodgroup))>0) {
-      APPEND(src,srcc)
-    }
-    if (show_density) {
-      char tmp[32];
-      int tmpc=snprintf(tmp,sizeof(tmp)," x %d",item->density);
-      if ((tmpc>0)&&(tmpc<sizeof(tmp))) {
-        APPEND(tmp,tmpc)
-      }
-    }
-    APPEND("\n",1)
-    COLOR(2)
-    if ((srcc=strings_get(&src,RID_strings_item_desc,itemid))>0) { // Item description.
-      APPENDLN(src,srcc)
-    }
-  }
-  #undef APPEND
-  #undef APPENDLN
-  #undef COLOR
-  
-  const uint32_t colorv[10]={
-    0xffffffff, // Default, not used.
-    0xffff00ff, // Item name.
-    0xa0c0e0ff, // Description.
-    0x00ff00ff, // Vegetable.
-    0xffc040ff, // Meat.
-    0x00ffffff, // Candy.
-    0xa0a0a0ff, // Inedible.
-    0xff4030ff, // Poison.
-    0xffc0ffff, // Sauce.
-    0, // Reserved.
-  };
+  int textc=sauces_generate_item_description(text,sizeof(text),itemid,ITEM_DESC_COLOR);
   struct font_line linev[32];
   int linec=font_break_lines(linev,sizeof(linev)/sizeof(linev[0]),g.font6,text,textc,LAYER->descw);
   if (linec>sizeof(linev)/sizeof(linev[0])) linec=sizeof(linev)/sizeof(linev[0]);
@@ -289,12 +236,12 @@ static void pause_generate_item_desc_texture(struct layer *layer) {
   if (!rgba) return;
   
   int y=0,i=linec;
-  uint32_t color=colorv[0];
+  uint32_t color=sauces_item_description_colorv[0];
   struct font_line *line=linev;
   for (;i-->0;line++,y+=7) {
     if ((line->c>=2)&&(line->v[0]==0x7f)) {
       int ix=line->v[1]-'0';
-      if ((ix>=0)&&(ix<10)) color=colorv[ix];
+      if ((ix>=0)&&(ix<10)) color=sauces_item_description_colorv[ix];
       line->v+=2;
       line->c-=2;
     }

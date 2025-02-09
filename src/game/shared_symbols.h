@@ -58,8 +58,8 @@
 #define NS_race_rabbit    2
 #define NS_race_octopus   3
 #define NS_race_werewolf  4
+#define NS_race_princess  5
 
-  
 #define NS_foodgroup_inedible 0
 #define NS_foodgroup_poison   1
 #define NS_foodgroup_veg      2
@@ -67,9 +67,10 @@
 #define NS_foodgroup_candy    4
 #define NS_foodgroup_sauce    5
 
-#define NS_itemflag_valid 0 /* This flag doesn't mean anything, but a full-zero flags byte means "unused". */
-#define NS_itemflag_cell  1 /* Hero should highlight the operative cell when armed. */
-#define NS_itemflag_plant 2 /* Allowed to plant. */
+#define NS_itemflag_valid    0 /* This flag doesn't mean anything, but a full-zero flags byte means "unused". */
+#define NS_itemflag_cell     1 /* Hero should highlight the operative cell when armed. */
+#define NS_itemflag_plant    2 /* Allowed to plant. */
+#define NS_itemflag_precious 3 /* Don't let her cook it without confirming. */
 
 #define NS_itemusage_none     0 /* Not an item you can use. */
 #define NS_itemusage_drop     1 /* Create an 'item' sprite that can be picked up. */

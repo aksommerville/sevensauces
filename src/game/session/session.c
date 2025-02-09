@@ -17,12 +17,50 @@ void session_del(struct session *session) {
 /* Add customer.
  */
  
-static struct customer *session_add_customer(struct session *session,int race) {
-  if (session->customerc>=SESSION_CUSTOMER_LIMIT) return 0;
+struct customer *session_add_customer(struct session *session,int race) {
+  if ((race<1)||(race>5)) return 0;
+  if (session->customerc>=SESSION_CUSTOMER_LIMIT) {
+    if ((race>=1)&&(race<=4)) session->custover[race-1]++;
+    return 0;
+  }
   struct customer *customer=session->customerv+session->customerc++;
   memset(customer,0,sizeof(struct customer));
   customer->race=race;
   return customer;
+}
+
+/* Remove customer.
+ */
+ 
+void session_remove_customer_at(struct session *session,int p) {
+  if (!session||(p<0)||(p>=session->customerc)) return;
+  struct customer *customer=session->customerv+p;
+  customer->race=0;
+}
+
+void session_lose_customer_at(struct session *session,int p) {
+  if (!session||(p<0)||(p>=session->customerc)) return;
+  struct customer *customer=session->customerv+p;
+  if (session->lossc<SESSION_CUSTOMER_LIMIT) {
+    struct loss *loss=session->lossv+session->lossc++;
+    memset(loss,0,sizeof(struct loss));
+    loss->race=customer->race;
+    loss->mapid=RID_map_village;//TODO loss location
+    loss->x=10;
+    loss->y=10;
+  }
+  customer->race=0;
+}
+
+void session_commit_removals(struct session *session) {
+  struct customer *customer=session->customerv+session->customerc-1;
+  int i=session->customerc;
+  for (;i-->0;customer--) {
+    if (!customer->race) {
+      session->customerc--;
+      memmove(customer,customer+1,sizeof(struct customer)*(session->customerc-i));
+    }
+  }
 }
 
 /* Init, the fallible parts.
@@ -54,6 +92,10 @@ static int session_init(struct session *session) {
   session_add_customer(session,NS_race_rabbit);
   session_add_customer(session,NS_race_octopus);
   session_add_customer(session,NS_race_werewolf);
+  /**int i=20; while (i-->0) { //XXX add a bunch of customers so i can see a well-populated kitchen
+    session_add_customer(session,NS_race_man+(rand()&3));
+  }/**/
+  //session_add_customer(session,NS_race_princess);
   
   return 0;
 }
@@ -265,4 +307,14 @@ void session_summarize_inventory(struct invsum *invsum,const struct session *ses
     invsum->meatc+=saucec;
     invsum->candyc+=saucec;
   }
+}
+
+/* Check for early game-over.
+ */
+ 
+int session_may_proceed(const struct session *session) {
+  if (!session) return 0;
+  if (session->customerc) return 1;
+  if (session->lossc) return 1;
+  return 0;
 }

@@ -71,9 +71,10 @@ void menu_force_focus_bounds(struct menu *menu) {
  */
  
 void menu_set_focus(struct menu *menu,struct widget *widget) {
+  if (!widget) return;
   if (widget==menu->focus.widget) return;
   if (menu->focus.widget&&menu->focus.widget->type->focus) {
-    menu->focus.widget->type->focus(widget,0);
+    menu->focus.widget->type->focus(menu->focus.widget,0);
   }
   int cx,cy,cw,ch;
   menu_get_cursor(&cx,&cy,&cw,&ch,menu);
@@ -101,6 +102,20 @@ void menu_set_focus(struct menu *menu,struct widget *widget) {
   if (widget&&widget->type->focus) {
     widget->type->focus(widget,1);
   }
+}
+
+void menu_focus_id(struct menu *menu,int id) {
+  menu_set_focus(menu,menu_widget_by_id(menu,id));
+}
+
+struct widget *menu_widget_by_id(const struct menu *menu,int id) {
+  if (!menu) return 0;
+  int i=menu->widgetc;
+  while (i-->0) {
+    struct widget *widget=menu->widgetv[i];
+    if (widget->id==id) return widget;
+  }
+  return 0;
 }
 
 /* Find and focus the default widget.

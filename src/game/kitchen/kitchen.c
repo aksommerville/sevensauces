@@ -118,9 +118,27 @@ struct kitchen *kitchen_new() {
   return kitchen;
 }
 
-/* Commit to session, last chance to persist anything.
+/* Point out obvious flaws in Dot's plan.
  */
  
-void kitchen_commit_to_session(struct kitchen *kitchen) {
-  //TODO
+int kitchen_requires_approval(const struct kitchen *kitchen) {
+  if (!kitchen) return KITCHEN_PRE_APPROVED;
+  int ingredientc=0,invp=0;
+  for (;invp<INVENTORY_SIZE;invp++) {
+    if (!kitchen->selected[invp]) continue;
+    uint8_t itemid=g.session->inventory[invp];
+    const struct item *item=itemv+itemid;
+    switch (item->foodgroup) {
+      case NS_foodgroup_veg:
+      case NS_foodgroup_meat:
+      case NS_foodgroup_candy:
+      case NS_foodgroup_sauce: {
+          ingredientc++;
+        } break;
+      case NS_foodgroup_poison: return KITCHEN_APPROVAL_POISON;
+    }
+    if (item->flags&(1<<NS_itemflag_precious)) return KITCHEN_APPROVAL_PRECIOUS;
+  }
+  if (!ingredientc) return KITCHEN_APPROVAL_EMPTY;
+  return KITCHEN_PRE_APPROVED;
 }

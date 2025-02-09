@@ -11,7 +11,7 @@
 #define SESSION_MAP_LIMIT 8 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
 #define SESSION_PLANT_LIMIT 64 /* Completely arbitrary. I think 64 will be pretty hard to reach. */
-#define SESSION_CUSTOMER_LIMIT 319 /* Mathematically impossible to have more, except for unplayable customers added the last night (639 if we include those) */
+#define SESSION_CUSTOMER_LIMIT 320 /* Mathematically impossible to have more, except for unplayable customers added the last night (640 if we include those) */
 
 struct session {
   int day; // 0..7, if 7 we're done playing
@@ -37,6 +37,7 @@ struct session {
     uint8_t race; // NS_race_*
   } customerv[SESSION_CUSTOMER_LIMIT];
   int customerc;
+  int custover[4]; // Overflow customer count by race (-1). Relevant only for scoring the final night.
   
   /* (lossv) gets populated at the end of night, with removed customers who can be apologized to.
    * If that apology happens, remove them from here and add to (customerv).
@@ -55,6 +56,16 @@ struct map *session_get_map(struct session *session,int mapid);
 int session_get_free_inventory_slot(const struct session *session);
 int session_count_free_inventory_slots(const struct session *session);
 
+/* Losing a customer removes it but also adds a loss.
+ * Those are ones that you can recover the next day by apologizing.
+ * Lose and remove don't shuffle the list immediately -- You have to session_commit_removals() after.
+ * That affords kitchen a window in which its collected customer indices won't change.
+ */
+struct customer *session_add_customer(struct session *session,int race);
+void session_remove_customer_at(struct session *session,int p);
+void session_lose_customer_at(struct session *session,int p);
+void session_commit_removals(struct session *session);
+
 /* Acquire a new item.
  * If you provide either of (cb,userdata), we are allowed to create passive feedback. (sound effect and toast).
  * If you provide (cb) and no slot is available, we'll spawn a modal to ask whether to drop an item.
@@ -64,6 +75,11 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
 
 struct plant *session_add_plant(struct session *session);
 void session_apply_plants(struct session *session);
+
+/* Nonzero to continue playing. ie we have at least one customer or loss.
+ * If this returns zero at the end of a night, it's Game Over.
+ */
+int session_may_proceed(const struct session *session);
 
 /* Veg, meat, and candy counts include the sauce count divided by 3 -- sauce counts as all 3 groups.
  */

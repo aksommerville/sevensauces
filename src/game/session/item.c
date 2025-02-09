@@ -5,6 +5,8 @@
 #define VALID ((1<<NS_itemflag_valid))
 #define CELL ((1<<NS_itemflag_valid)|(1<<NS_itemflag_cell))
 #define PLANT ((1<<NS_itemflag_valid)|(1<<NS_itemflag_plant))
+#define PRECIOUS ((1<<NS_itemflag_valid)|(1<<NS_itemflag_precious))
+#define CELLPREC ((1<<NS_itemflag_valid)|(1<<NS_itemflag_cell)|(1<<NS_itemflag_precious))
 
 const struct item itemv[256]={
   [NS_item_none]={0},
@@ -41,15 +43,15 @@ const struct item itemv[256]={
   [NS_item_birthdaycake]={VALID,NS_foodgroup_candy,20,NS_itemusage_drop,0},
   [NS_item_weddingcake ]={VALID,NS_foodgroup_candy,25,NS_itemusage_drop,0},
   
-  [NS_item_shovel    ]={CELL ,0,0,NS_itemusage_shovel  ,0},
-  [NS_item_fishpole  ]={CELL ,0,0,NS_itemusage_fishpole,0},
-  [NS_item_bow       ]={VALID,0,0,NS_itemusage_bow     ,0},
-  [NS_item_sword     ]={VALID,0,0,NS_itemusage_sword   ,0},
-  [NS_item_stone     ]={VALID,0,0,NS_itemusage_stone   ,0},
-  [NS_item_apology   ]={VALID,0,0,NS_itemusage_letter  ,0},
-  [NS_item_loveletter]={VALID,0,0,NS_itemusage_letter  ,0},
-  [NS_item_trap      ]={CELL ,0,0,NS_itemusage_trap    ,0},
-  [NS_item_grapple   ]={VALID,0,0,NS_itemusage_grapple ,0},
+  [NS_item_shovel    ]={CELLPREC,0,0,NS_itemusage_shovel  ,0},
+  [NS_item_fishpole  ]={CELLPREC,0,0,NS_itemusage_fishpole,0},
+  [NS_item_bow       ]={PRECIOUS,0,0,NS_itemusage_bow     ,0},
+  [NS_item_sword     ]={PRECIOUS,0,0,NS_itemusage_sword   ,0},
+  [NS_item_stone     ]={VALID   ,0,0,NS_itemusage_stone   ,0},
+  [NS_item_apology   ]={VALID   ,0,0,NS_itemusage_letter  ,0},
+  [NS_item_loveletter]={VALID   ,0,0,NS_itemusage_letter  ,0},
+  [NS_item_trap      ]={CELL    ,0,0,NS_itemusage_trap    ,0},
+  [NS_item_grapple   ]={PRECIOUS,0,0,NS_itemusage_grapple ,0},
   
   [NS_item_arsenic     ]={VALID,NS_foodgroup_poison,  1,NS_itemusage_drop,0},
   [NS_item_sunsauce    ]={VALID,NS_foodgroup_sauce ,126,NS_itemusage_drop,0},
