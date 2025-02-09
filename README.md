@@ -35,6 +35,11 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Machine gun
 - - [ ] Spell of darkness
 - - [ ] Cat
+- [ ] Bring in existing music:
+- - candy_apple
+- - watcher_of_pots
+- - bowlful_of_moonlight
+- - doors_open_at_sundown
 
 ## Notes re starting over
 
@@ -89,6 +94,9 @@ Customers:
 - Elf: Satisfied if veg>meat. Ecstatic if all veg are different.
 - Leprechaun: Satisfied if candy present. Ecstatic if candy>veg and candy>meat.
 - Werewolf: Satisfied if anything present. Ecstatic if portions exceed population.
+
+XXX Elf and Leprechaun look too much like Man, and way too much like each other.
+Use Rabbit and Octopus instead. Octopus eats candy, right?
 
 A consequence of this approach is that all customers of a given class will react the same way every time.
 Is that desirable?

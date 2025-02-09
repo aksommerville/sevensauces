@@ -54,6 +54,12 @@
   _(faun) \
   _(grapple)
   
+#define NS_race_man       1
+#define NS_race_rabbit    2
+#define NS_race_octopus   3
+#define NS_race_werewolf  4
+
+  
 #define NS_foodgroup_inedible 0
 #define NS_foodgroup_poison   1
 #define NS_foodgroup_veg      2

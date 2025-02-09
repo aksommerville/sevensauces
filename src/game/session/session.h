@@ -11,6 +11,7 @@
 #define SESSION_MAP_LIMIT 8 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
 #define SESSION_PLANT_LIMIT 64 /* Completely arbitrary. I think 64 will be pretty hard to reach. */
+#define SESSION_CUSTOMER_LIMIT 319 /* Mathematically impossible to have more, except for unplayable customers added the last night (639 if we include those) */
 
 struct session {
   int day; // 0..7, if 7 we're done playing
@@ -30,7 +31,21 @@ struct session {
   } plantv[SESSION_PLANT_LIMIT];
   int plantc;
   
-  int customerc;//TODO
+  /* (customerv) only includes real customers, ones that will show up tonight.
+   */
+  struct customer {
+    uint8_t race; // NS_race_*
+  } customerv[SESSION_CUSTOMER_LIMIT];
+  int customerc;
+  
+  /* (lossv) gets populated at the end of night, with removed customers who can be apologized to.
+   * If that apology happens, remove them from here and add to (customerv).
+   */
+  struct loss {
+    uint8_t race;
+    int mapid,x,y;
+  } lossv[SESSION_CUSTOMER_LIMIT];
+  int lossc;
 };
 
 void session_del(struct session *session);

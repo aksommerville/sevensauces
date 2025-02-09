@@ -2,9 +2,12 @@
 #include "game/menu/menu.h"
 #include "layer.h"
 
+#define HELLO_SONG RID_song_garlic_sauce
+
 struct layer_hello {
   struct layer hdr;
   struct menu *menu;
+  int focus;
 };
 
 #define LAYER ((struct layer_hello*)layer)
@@ -35,6 +38,7 @@ static void hello_cb_quit(struct widget *widget) {
 
 static int _hello_init(struct layer *layer) {
   layer->opaque=1;
+  LAYER->focus=1;
   if (!(LAYER->menu=menu_new())) return -1;
   LAYER->menu->userdata=layer;
   
@@ -47,12 +51,18 @@ static int _hello_init(struct layer *layer) {
   widget_decal_spawn_string(LAYER->menu,FBW>>1,130,0,RID_strings_ui,3,FBW,0xffffffff,hello_cb_credits,layer);
   widget_decal_spawn_string(LAYER->menu,FBW>>1,145,0,RID_strings_ui,4,FBW,0xffffffff,hello_cb_quit,layer);
   
-  egg_play_song(0,0,1);
+  egg_play_song(HELLO_SONG,0,1);
   
   return 0;
 }
 
 static void _hello_input(struct layer *layer,int input,int pvinput) {
+  if ((input&EGG_BTN_CD)&&!LAYER->focus) {
+    LAYER->focus=1;
+    egg_play_song(HELLO_SONG,0,1);
+  } else if (!(input&EGG_BTN_CD)) {
+    LAYER->focus=0;
+  }
   menu_input(LAYER->menu,input,pvinput);
 }
 

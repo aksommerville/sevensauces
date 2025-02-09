@@ -14,10 +14,24 @@ void session_del(struct session *session) {
   free(session);
 }
 
+/* Add customer.
+ */
+ 
+static struct customer *session_add_customer(struct session *session,int race) {
+  if (session->customerc>=SESSION_CUSTOMER_LIMIT) return 0;
+  struct customer *customer=session->customerv+session->customerc++;
+  memset(customer,0,sizeof(struct customer));
+  customer->race=race;
+  return customer;
+}
+
 /* Init, the fallible parts.
  */
  
 static int session_init(struct session *session) {
+
+  /* Gather resources.
+   */
   struct rom_reader reader;
   if (rom_reader_init(&reader,g.rom,g.romc)<0) return -1;
   struct rom_res *res;
@@ -33,6 +47,14 @@ static int session_init(struct session *session) {
         } break;
     }
   }
+  
+  /* Initial customer set.
+   */
+  session_add_customer(session,NS_race_man);
+  session_add_customer(session,NS_race_rabbit);
+  session_add_customer(session,NS_race_octopus);
+  session_add_customer(session,NS_race_werewolf);
+  
   return 0;
 }
 
