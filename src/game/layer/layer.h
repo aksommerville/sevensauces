@@ -81,6 +81,7 @@ extern const struct layer_type layer_type_credits;
 extern const struct layer_type layer_type_beginday;
 extern const struct layer_type layer_type_world;
 extern const struct layer_type layer_type_kitchen;
+extern const struct layer_type layer_type_eod;
 extern const struct layer_type layer_type_pause;
 extern const struct layer_type layer_type_toast;
 extern const struct layer_type layer_type_message;

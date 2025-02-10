@@ -40,9 +40,10 @@ static void kitchen_on_ready(struct layer *layer) {
     fprintf(stderr,"*** Kitchen requires approval, condition %d. Proceeding anyway. ***\n",approval);//TODO
   }
   //TODO Animate delivery to the customers.
-  //TODO EOD report? Probably want a new layer for this.
   kitchen_apply(g.kitchen);
-  sauces_end_night();
+  if (!layer_spawn(&layer_type_eod)) {
+    sauces_end_night();
+  }
 }
 
 /* Advice.

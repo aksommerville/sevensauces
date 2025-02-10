@@ -22,7 +22,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [x] Technical stew content: Show count of helpings, both total and per food group.
 - - [x] Details of focussed ingredient.
 - - [ ] Advice.
-- - [ ] Require confirmation at Ready for obviously incorrect stews? Eg no ingredients, or poison included.
+- - [ ] Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
 - - [ ] Animate delivery. ...punt this, maybe we don't need it, if there's going to be a separate daily-wrap-up modal.
 - - [ ] Separate scoreboard sequence after delivery.
 - [ ] Should we give Dot some of her Full Moon toys too?
