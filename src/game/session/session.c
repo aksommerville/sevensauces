@@ -18,6 +18,7 @@ void session_del(struct session *session) {
  */
  
 struct customer *session_add_customer(struct session *session,int race) {
+  if (!race) race=1+rand()%4;
   if ((race<1)||(race>5)) return 0;
   if (session->customerc>=SESSION_CUSTOMER_LIMIT) {
     if ((race>=1)&&(race<=4)) session->custover[race-1]++;

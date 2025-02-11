@@ -40,7 +40,7 @@ static void kitchen_on_ready(struct layer *layer) {
     fprintf(stderr,"*** Kitchen requires approval, condition %d. Proceeding anyway. ***\n",approval);//TODO
   }
   //TODO Animate delivery to the customers.
-  kitchen_apply(g.kitchen);
+  //kitchen_apply(g.kitchen);//XXX Let EOD layer worry about this
   if (!layer_spawn(&layer_type_eod)) {
     sauces_end_night();
   }
@@ -78,7 +78,6 @@ static void kitchen_cb_activate(struct menu *menu,struct widget *widget) {
  
 static void kitchen_cb_cancel(struct menu *menu) {
   struct layer *layer=menu->userdata;
-  sauces_end_night();
 }
 
 /* Init.
@@ -133,6 +132,9 @@ static void _kitchen_input(struct layer *layer,int input,int pvinput) {
 }
 
 static void _kitchen_update(struct layer *layer,double elapsed) {
+
+  g.kitchen->clock+=elapsed;
+
   menu_update(LAYER->menu,elapsed);
   
   struct widget *nfocus=LAYER->menu->focus.widget;
@@ -209,10 +211,10 @@ static void kitchen_rebuild_details(struct layer *layer) {
   free(rgba);
 }
 
-/* Render customers for SMALL dining room.
+/* Render customers.
  */
  
-static void kitchen_render_small_table(struct layer *layer,int y) {
+static void kitchen_render_table(struct layer *layer,int y) {
   // Colors should match image:kitchen_large but it's not life-or-death.
   const uint32_t line_color=0x493c29ff;
   const uint32_t surface_color=0xa48760ff;
@@ -224,12 +226,12 @@ static void kitchen_render_small_table(struct layer *layer,int y) {
   graf_draw_line(&g.graf,0,y+surfaceh,FBW,y+surfaceh,line_color);
 }
 
-static void kitchen_render_small_customer(struct layer *layer,int x,int y,const struct kcustomer *kcustomer,int texid) {
+static void kitchen_render_customer(struct layer *layer,int x,int y,const struct kcustomer *kcustomer,int texid) {
   int srcx=1,srcy=69+41*(kcustomer->race-1);
   graf_draw_decal(&g.graf,texid,x,y,srcx,srcy,40,40,0);
 }
  
-static void kitchen_render_customers_SMALL(struct layer *layer,int texid) {
+static void kitchen_render_customers(struct layer *layer,int texid) {
   const int cellsize=40;
   const int ytop=FBH-cellsize*2; // Three rows but the middle row is staggered so effectively two.
   const int tabletop=27; // Distance from cell top to table line. Must agree with image:kitchen_bits.
@@ -237,9 +239,9 @@ static void kitchen_render_customers_SMALL(struct layer *layer,int texid) {
   /* First draw the three tables.
    * These don't need to occlude anything except each other; diners are drawn with transparency where the table goes.
    */
-  kitchen_render_small_table(layer,ytop+tabletop);
-  kitchen_render_small_table(layer,ytop+(cellsize>>1)+tabletop);
-  kitchen_render_small_table(layer,ytop+cellsize+tabletop);
+  kitchen_render_table(layer,ytop+tabletop);
+  kitchen_render_table(layer,ytop+(cellsize>>1)+tabletop);
+  kitchen_render_table(layer,ytop+cellsize+tabletop);
   
   /* Customers are in three rows: 8,7,8. The middle row starts half a cell in.
    */
@@ -247,21 +249,21 @@ static void kitchen_render_customers_SMALL(struct layer *layer,int texid) {
   int x,i;
   for (x=0,i=8;i-->0;kcustomer++,x+=cellsize) {
     if (!kcustomer->race) continue;
-    kitchen_render_small_customer(layer,x,ytop,kcustomer,texid);
+    kitchen_render_customer(layer,x,ytop,kcustomer,texid);
   }
   for (x=cellsize>>1,i=7;i-->0;kcustomer++,x+=cellsize) {
     if (!kcustomer->race) continue;
-    kitchen_render_small_customer(layer,x,ytop+(cellsize>>1),kcustomer,texid);
+    kitchen_render_customer(layer,x,ytop+(cellsize>>1),kcustomer,texid);
   }
   for (x=0,i=8;i-->0;kcustomer++,x+=cellsize) {
     if (!kcustomer->race) continue;
-    kitchen_render_small_customer(layer,x,ytop+cellsize,kcustomer,texid);
+    kitchen_render_customer(layer,x,ytop+cellsize,kcustomer,texid);
   }
 }
 
 /* Render customers for LARGE dining room.
  */
- 
+ #if 0 // XXX
 static void kitchen_render_customers_LARGE(struct layer *layer) {
   const int colc=40;
   const int rowc=8;
@@ -288,6 +290,7 @@ static void kitchen_render_customers_LARGE(struct layer *layer) {
     map,colc,rowc,colc
   );
 }
+#endif
 
 /* Compose the text for the front of the cauldron, as tiles from image:kitchen_large.
  */
@@ -401,10 +404,7 @@ static void _kitchen_render(struct layer *layer) {
   
   /* Customers.
    */
-  switch (g.kitchen->size) {
-    case DINING_ROOM_SMALL: kitchen_render_customers_SMALL(layer,texid); break;
-    case DINING_ROOM_LARGE: kitchen_render_customers_LARGE(layer); break;
-  }
+  kitchen_render_customers(layer,texid);
   
   /* Current stew content, on the front of the cauldron.
    * Doing this immediately after customers, since it uses image:kitchen_large.

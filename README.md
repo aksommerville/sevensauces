@@ -127,3 +127,48 @@ The most real customers you could have is 319, and the most for scoring purposes
 
 The limit for each food group appears to be 519 (7 sauces, ie `7*42 + 25*9`).
 It won't necessarily be possible to get 9 of the 25-point ingredients (eg I'm picturing Wedding Cake can only be got once per day).
+
+-------------------------
+2025-02-10
+I'm not crazy about the exponential growth. It just feels weird, human intuition isn't great with exponential series.
+A radical change of dinner rules:
+ - Start with 4 as today, but add no more than 3 per night.
+ - Including the Princess, that yields a maximum of 23 -- exactly what the small dining room can accomodate.
+ - +1 if all customers are satisfied, as today.
+ - +1 for a rule depending on which race has the most members:
+ - - Man: Natural veg, meat, and candy counts identical and nonzero.
+ - - Rabbit: Natural veg>meat and veg>candy.
+ - - Octopus: Natural candy>veg and candy>meat.
+ - - Werewolf: Natural meat>veg and meat>candy.
+ - - ...in other words, which food group is best represented.
+ - - In a tie, you can satisfy any of the tied rules. So on Monday, you automatically win this.
+ - +1 for a special rule, unique for each day. Just thinking out loud:
+ - - Monday: All ingredients unique.
+ - - Tuesday: All ingredients in pairs. "Twofer Tuesday!"
+ - - Wednesday: No leftovers.
+ - - Thursday: Leftovers at least double.
+ - - Friday: No single-point ingredients.
+ - - Saturday: Max 4 ingredients.
+ - - Sunday: Must include secret sauce.
+ - Reduce densities, put the max somewhere around 10 instead of 25.
+ 
+Then each race has just one rule, to distinguish SAD from HAPPY.
+These won't apply when Poison or Secret Sauce was used.
+ - Man: Night clock below some threshold. Add a night clock!
+ - Rabbit: Veg present.
+ - Octopus: Candy present.
+ - Werewolf: Meat present.
+ - Princess: Always HAPPY.
+ 
+Some consequences of this change:
+ - Don't need large dining room graphics.
+ - Daily deltas are uniform, I think that will feel more natural.
+ - Per-day rule is a great touch for variety's sake.
+ - Won't be much pressure to optimize for density.
+ - The "no leftovers" rules might prove incompatible with secret sauces. Maybe sauces should never produce leftovers, their effective density clamps?
+ - Every customer matters. When there's 200 of them, Apology Cards feel pointless. But just 20, yeah, you can bring them back retail.
+ - ^ To press that harder: It wouldn't be crazy to draw 23 unique customers.
+ - Dramatically reduces memory footprint, as if that matters.
+
+This sounds good. Do it.
+...early test runs: I love it. Much more interesting than before.

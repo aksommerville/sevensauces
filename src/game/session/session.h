@@ -11,7 +11,7 @@
 #define SESSION_MAP_LIMIT 8 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
 #define SESSION_PLANT_LIMIT 64 /* Completely arbitrary. I think 64 will be pretty hard to reach. */
-#define SESSION_CUSTOMER_LIMIT 320 /* Mathematically impossible to have more, except for unplayable customers added the last night (640 if we include those) */
+#define SESSION_CUSTOMER_LIMIT 23 /* The rules and the kitchen layout are dependent on 23. Changing would be a big deal. */
 
 struct session {
   int day; // 0..7, if 7 we're done playing
@@ -61,7 +61,7 @@ int session_count_free_inventory_slots(const struct session *session);
  * Lose and remove don't shuffle the list immediately -- You have to session_commit_removals() after.
  * That affords kitchen a window in which its collected customer indices won't change.
  */
-struct customer *session_add_customer(struct session *session,int race);
+struct customer *session_add_customer(struct session *session,int race); // race zero for random.
 void session_remove_customer_at(struct session *session,int p);
 void session_lose_customer_at(struct session *session,int p);
 void session_commit_removals(struct session *session);
@@ -94,7 +94,7 @@ void session_summarize_inventory(struct invsum *invsum,const struct session *ses
 struct item {
   uint8_t flags;
   uint8_t foodgroup;
-  uint8_t density;
+  uint8_t density; // Must be zero for inedibles.
   uint8_t usage;
   uint8_t harvestq; // For harvestable things, how many at a time? In general, 3 for flora and 1 for fauna.
 };

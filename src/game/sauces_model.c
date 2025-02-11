@@ -74,7 +74,7 @@ int sauces_end_day() {
 int sauces_end_night() {
   layer_stack_filter(filter_layer_nonsession);
   if (g.kitchen) {
-    kitchen_commit_to_session(g.kitchen);
+    //kitchen_commit_to_session(g.kitchen);//TODO ensure we have a sensible venue for committing, somewhere...
     kitchen_del(g.kitchen);
     g.kitchen=0;
   }

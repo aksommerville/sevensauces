@@ -9,6 +9,7 @@
 
 struct layer_eod {
   struct layer hdr;
+  struct stew stew;
 };
 
 #define LAYER ((struct layer_eod*)layer)
@@ -23,6 +24,9 @@ static void _eod_del(struct layer *layer) {
  */
  
 static int _eod_init(struct layer *layer) {
+  if (!g.session||!g.kitchen) return -1;
+  kitchen_cook(&LAYER->stew,g.kitchen);
+  kitchen_commit_stew(&LAYER->stew);//TODO I think this is ok? Get it out of the way. If needed, we can wait until dismiss to commit it.
   return 0;
 }
 
