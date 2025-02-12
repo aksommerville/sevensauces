@@ -4,28 +4,18 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [x] World overlay
-- [x] Sword
-- [x] Try graphics with outline.
-- [x] Grapple
-- [x] Fishpole
-- [x] Letter
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Freshen tree and trap tiles. Lots are missing, and we have a bunch with no item anymore. And all look bad.
 - [ ] Sort sprites before render
 - [ ] Doors
+- [ ] Money
+- [ ] Earn money each day, say $1/customer?
 - [ ] Transient entities: Vegetables, animals, stones...
 - [ ] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Condensery
-- [ ] Kitchen
-- - [ ] Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
-- - [x] Technical stew content: Show count of helpings, both total and per food group.
-- - [x] Details of focussed ingredient.
-- - [ ] Advice.
-- - [ ] Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
-- - [x] Animate delivery. ...punt this, maybe we don't need it, if there's going to be a separate daily-wrap-up modal. ...yeah, i think not necessary.
-- - [x] Separate scoreboard sequence after delivery.
-- - [x] Show clock. Can we do an hourglass with realistic physics?
+- [ ] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
+- [ ] Kitchen: Advice.
+- [ ] Kitchen: Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
 - [ ] Should we give Dot some of her Full Moon toys too?
 - - YES: Broom, Umbrella, Bell
 - - NO: Chalk, Violin, Hat, Feather, Pitcher
@@ -35,7 +25,6 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - - Matches probably not, since we don't (and won't) have item quantities.
 - - - Compass probably not, there's no buried treasure and no place for narrative guidance.
 - [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
-- [x] Pause: Show name and description of highlighted item. Importantly, the foodgroup and density.
 - [ ] Release grapple over water. What should happen? What we have is not ok.
 - [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
 - [ ] Fishing challenges:
@@ -43,13 +32,8 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Machine gun
 - - [ ] Spell of darkness
 - - [ ] Cat
-- [x] Bring in existing music:
-- - candy_apple
-- - watcher_of_pots
-- - bowlful_of_moonlight
-- - doors_open_at_sundown
 - [ ] An eighth bonus quest: Rescue the Princess. No sauce for winning, but the Princess will show up as a customer.
-- - That way, we have a max of 320 instead of 319 -- exactly the capacity we can render.
+- - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
 
 ## Notes re starting over
 

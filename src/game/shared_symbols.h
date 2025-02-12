@@ -27,7 +27,7 @@
 #define NS_tilesheet_neighbors   0
 #define NS_tilesheet_family      0
 #define NS_tilesheet_weight      0
-#define NS_tilesheet_itemid      2 /* For tiles with physics==harvest, which item? */
+#define NS_tilesheet_item        2 /* For tiles with physics==harvest, which item? */
 
 #define NS_physics_vacant 0
 #define NS_physics_solid 1

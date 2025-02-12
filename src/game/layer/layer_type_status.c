@@ -81,6 +81,7 @@ static void status_draw_inventory_summary(struct layer *layer,int texid,int16_t 
   status_draw_tiny_int(layer,texid,dstx,dsty,0x0c,LAYER->invsum.meatc); dsty+=6;
   status_draw_tiny_int(layer,texid,dstx,dsty,0x0d,LAYER->invsum.candyc); dsty+=6;
   status_draw_tiny_int(layer,texid,dstx,dsty,0x0e,g.session->customerc); dsty+=6;
+  status_draw_tiny_int(layer,texid,dstx,dsty,0x0f,g.session->gold); dsty+=6;
 }
 
 static void _status_render(struct layer *layer) {

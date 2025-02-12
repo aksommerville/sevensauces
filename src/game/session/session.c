@@ -93,10 +93,8 @@ static int session_init(struct session *session) {
   session_add_customer(session,NS_race_rabbit);
   session_add_customer(session,NS_race_octopus);
   session_add_customer(session,NS_race_werewolf);
-  /**int i=20; while (i-->0) { //XXX add a bunch of customers so i can see a well-populated kitchen
-    session_add_customer(session,NS_race_man+(rand()&3));
-  }/**/
-  //session_add_customer(session,NS_race_princess);
+  
+  session->gold=10;
   
   return 0;
 }
@@ -232,7 +230,7 @@ static void session_read_tilesheet(uint8_t *physics,uint8_t *tsitemid,int imagei
   while (rom_tilesheet_reader_next(&entry,&reader)>0) {
     switch (entry.tableid) {
       case NS_tilesheet_physics: memcpy(physics+entry.tileid,entry.v,entry.c); break;
-      case NS_tilesheet_itemid: memcpy(tsitemid+entry.tileid,entry.v,entry.c); break;
+      case NS_tilesheet_item: memcpy(tsitemid+entry.tileid,entry.v,entry.c); break;
     }
   }
 }

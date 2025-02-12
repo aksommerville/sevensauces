@@ -17,6 +17,7 @@ struct session {
   int day; // 0..7, if 7 we're done playing
   uint8_t inventory[INVENTORY_SIZE]; // itemid
   uint8_t invp; // 0..15, which slot is selected
+  uint16_t gold; // 0..999
   
   struct map mapv[SESSION_MAP_LIMIT];
   int mapc;

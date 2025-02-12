@@ -54,7 +54,7 @@ static int world_load_tilesheet(struct world *world) {
   while (rom_tilesheet_reader_next(&entry,&reader)>0) {
     switch (entry.tableid) {
       case NS_tilesheet_physics: memcpy(world->physics+entry.tileid,entry.v,entry.c); break;
-      case NS_tilesheet_itemid: memcpy(world->tsitemid+entry.tileid,entry.v,entry.c); break;
+      case NS_tilesheet_item: memcpy(world->tsitemid+entry.tileid,entry.v,entry.c); break;
     }
   }
   return 0;
