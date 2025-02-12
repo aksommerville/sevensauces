@@ -82,7 +82,15 @@ static void hero_enter_condensery(struct sprite *sprite) {
  */
  
 static void hero_enter_door(struct sprite *sprite,int16_t dstmapid,uint8_t dstcol,uint8_t dstrow) {
-  fprintf(stderr,"%s map:%d @%d,%d\n",__func__,dstmapid,dstcol,dstrow);//TODO
+  //TODO Transition
+  if (world_load_map(g.world,dstmapid)<0) return;
+  sprite->x=dstcol+0.5;
+  sprite->y=dstrow+0.5;
+  
+  // Important! Update (col,row) eagerly so we don't trip the remote side of this door.
+  SPRITE->mapid=dstmapid;
+  SPRITE->col=dstcol;
+  SPRITE->row=dstrow;
 }
 
 /* Callback from a deferred single-item harvest.

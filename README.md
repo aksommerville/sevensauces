@@ -6,7 +6,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Sort sprites before render
-- [ ] Doors
+- [x] Doors
 - [x] Money
 - [x] Earn money each day, say $1/customer?
 - [ ] Transient entities: Vegetables, animals, stones...
@@ -36,6 +36,8 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
 - [ ] EOD: Show money earned (and move that into stew).
 - [ ] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
+- [ ] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
+- [ ] Door transitions
 
 ## Notes re starting over
 
@@ -159,3 +161,10 @@ Some consequences of this change:
 
 This sounds good. Do it.
 ...early test runs: I love it. Much more interesting than before.
+
+------------------------------------------
+
+2025-02-10: Apportioned the 8 challenge zones.
+With them all completely empty, I'm just barely able to reach every far corner in a single day.
+Once there's some actual challenge involved, this should be good.
+Two challenges per day should be possible, and 3 or 4 if you push it.

@@ -82,7 +82,6 @@ static int world_read_initial_map_commands(struct world_load_map *ctx,struct wor
           sprite_new(0,world->sprites,x,y,arg,rid);
         } break;
       //TODO song
-      //TODO other things to index at load... doors?
     }
   }
   return 0;
