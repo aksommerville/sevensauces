@@ -19,6 +19,7 @@ struct layer_kitchen {
   int details_w,details_h; // Zero to skip render, otherwise (79,91), the full available space.
   int details_dirty; // Rebuilds texture at the last moment.
   struct widget *focus; // WEAK, tracks menu focus so we know when details are dirty.
+  struct hourglass *hourglass;
 };
 
 #define LAYER ((struct layer_kitchen*)layer)
@@ -29,6 +30,7 @@ struct layer_kitchen {
 static void _kitchen_del(struct layer *layer) {
   menu_del(LAYER->menu);
   if (LAYER->details_texid) egg_texture_del(LAYER->details_texid);
+  hourglass_del(LAYER->hourglass);
 }
 
 /* Ready.
@@ -39,8 +41,6 @@ static void kitchen_on_ready(struct layer *layer) {
   if (approval) {
     fprintf(stderr,"*** Kitchen requires approval, condition %d. Proceeding anyway. ***\n",approval);//TODO
   }
-  //TODO Animate delivery to the customers.
-  //kitchen_apply(g.kitchen);//XXX Let EOD layer worry about this
   if (!layer_spawn(&layer_type_eod)) {
     sauces_end_night();
   }
@@ -86,6 +86,7 @@ static void kitchen_cb_cancel(struct menu *menu) {
 static int _kitchen_init(struct layer *layer) {
   if (!g.kitchen||!g.session) return -1;
   layer->opaque=1;
+  if (!(LAYER->hourglass=hourglass_new())) return -1;
   if (!(LAYER->menu=menu_new())) return -1;
   LAYER->menu->userdata=layer;
   LAYER->menu->cb_activate=kitchen_cb_activate;
@@ -261,37 +262,6 @@ static void kitchen_render_customers(struct layer *layer,int texid) {
   }
 }
 
-/* Render customers for LARGE dining room.
- */
- #if 0 // XXX
-static void kitchen_render_customers_LARGE(struct layer *layer) {
-  const int colc=40;
-  const int rowc=8;
-  const int tilesize=8;
-  uint8_t map[colc*rowc];
-  uint8_t *cell=map;
-  const struct kcustomer *kcustomer=g.kitchen->kcustomerv;
-  int i=colc*rowc,col=0,row=0;
-  for (;i-->0;cell++,kcustomer++) {
-    if (kcustomer->race>0) {
-      *cell=0x10+0x10*kcustomer->race;
-    } else {
-      *cell=0x10; // Empty seat.
-    }
-    if (row) (*cell)++; // Tiles with the backing table are all +1 from their top-row counterpart.
-    if (++col>=colc) {
-      col=0;
-      row++;
-    }
-  }
-  graf_draw_tile_buffer(
-    &g.graf,texcache_get_image(&g.texcache,RID_image_kitchen_large),
-    tilesize>>1,FBH-(tilesize*rowc)+(tilesize>>1),
-    map,colc,rowc,colc
-  );
-}
-#endif
-
 /* Compose the text for the front of the cauldron, as tiles from image:kitchen_large.
  */
  
@@ -305,31 +275,28 @@ static void kitchen_write_status_tiles(uint8_t *dst,int colc,int rowc,const stru
     const struct item *item=itemv+(*itemidv);
     ingc+=item->density;
     switch (item->foodgroup) {
-      case NS_foodgroup_veg: vegc+=item->density; break;
-      case NS_foodgroup_meat: meatc+=item->density; break;
-      case NS_foodgroup_candy: candyc+=item->density; break;
-      case NS_foodgroup_sauce: {
-          int per=item->density/3;
-          vegc+=per;
-          meatc+=per;
-          candyc+=per;
-        } break;
+      case NS_foodgroup_veg: vegc++; break;
+      case NS_foodgroup_meat: meatc++; break;
+      case NS_foodgroup_candy: candyc++; break;
+      case NS_foodgroup_sauce: break;
     }
   }
   int bowlc=g.session->customerc;
   int dstp=colc>>1;
   
-  #define DECIMAL3(_n) { \
+  #define DECIMAL2(_n) { \
     int n=_n; \
-    if (n>999) n=999; \
-    if (n>=100) dst[dstp++]=0xf0+n/100; \
+    if (n>99) n=99; \
     if (n>=10) dst[dstp++]=0xf0+(n/10)%10; \
     dst[dstp++]=0xf0+n%10; \
   }
   
+  /* Helpings count can go over 100.
+   * Everything else, it's fine to clamp at 99, they shouldn't be able to reach that high.
+   */
   dst[dstp]=0xfa; // slash, separating ingc from bowlc
   dstp++;
-  DECIMAL3(bowlc)
+  DECIMAL2(bowlc)
   dstp=colc>>1;
   dstp--;
   dst[dstp]=0xf0+ingc%10;
@@ -341,29 +308,24 @@ static void kitchen_write_status_tiles(uint8_t *dst,int colc,int rowc,const stru
     dst[dstp]=0xf0+(ingc/div)%10;
   }
   
-  dstp=colc;
+  /* The natural ingredient counts by food group realistically will always be one digit.
+   * But it is possible to exceed 10 so we allow it.
+   */
+  dstp=colc+2;
   dst[dstp++]=0xfc; // leaf
-  DECIMAL3(vegc)
-  dstp=colc+5;
+  DECIMAL2(vegc)
+  dstp=colc+6;
   dst[dstp++]=0xfd; // pig
-  DECIMAL3(meatc)
+  DECIMAL2(meatc)
   dstp=colc+10;
   dst[dstp++]=0xfe; // candy
-  DECIMAL3(candyc)
+  DECIMAL2(candyc)
   
   #undef DECIMAL3
 }
 
 /* Render, main.
  */
- 
-/* XXX TEMP Layout Notes.
-Framebuffer 320x180.
-Small dining room: 40x40 each, in 3 rows: 8,7,8. Up to 23. Height = 80
-Large dining room: 8x8 each, in 8 rows of 40. Up to 320 (limit 319). Height = 64
-Pantry starts near (164,20). xstride TILESIZE+2, ystride TILESIZE+5.
-Details panel: 237,4,79,91.
-*/
  
 static void _kitchen_render(struct layer *layer) {
   if (!g.kitchen) return;
@@ -397,6 +359,10 @@ static void _kitchen_render(struct layer *layer) {
   /* Menu handles the pantry items, and "Cook" and "Advice" buttons.
    */
   menu_render(LAYER->menu);
+  
+  /* Clock in the top left corner.
+   */
+  hourglass_render(1,1,LAYER->hourglass,g.kitchen->clock/g.kitchen->clock_limit);
   
   /* Word bubble, if Little Sister is talking.
    */

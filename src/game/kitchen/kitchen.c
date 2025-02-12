@@ -23,6 +23,9 @@ static void kitchen_init_customer(struct kcustomer *dst,const struct customer *s
  */
  
 static int kitchen_init(struct kitchen *kitchen) {
+
+  kitchen->clock_limit=clock_limit_by_day(g.session->day);
+
   uint8_t lut[SESSION_CUSTOMER_LIMIT];
   int i=SESSION_CUSTOMER_LIMIT;
   while (i-->0) lut[i]=i;
@@ -33,6 +36,7 @@ static int kitchen_init(struct kitchen *kitchen) {
     memmove(lut+lutp,lut+lutp+1,i-lutp);
     if (cp<g.session->customerc) kitchen_init_customer(kcustomer,g.session->customerv+cp);
   }
+  
   return 0;
 }
 

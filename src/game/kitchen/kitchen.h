@@ -5,6 +5,8 @@
 #ifndef KITCHEN_H
 #define KITCHEN_H
 
+#include "game/session/session.h"
+
 #define KITCHEN_OUTCOME_PENDING 0
 #define KITCHEN_OUTCOME_UNFED   1
 #define KITCHEN_OUTCOME_DEAD    2
@@ -26,23 +28,11 @@ struct kitchen {
   
   uint8_t selected[INVENTORY_SIZE]; // Nonzero for each selected inventory slot.
   double clock; // Counts up.
+  double clock_limit;
 };
 
 void kitchen_del(struct kitchen *kitchen);
 struct kitchen *kitchen_new();
-
-#if 0 // XXX
-/* Ensure that each non-vacant kcustomer has a definite outcome.
- * This is where the principal game logic lives.
- * Nothing in the session is changed.
- */
-void kitchen_apply(struct kitchen *kitchen);
-
-/* If we've been applied, now apply those changes to the global session.
- * Items will be removed from inventory, customers removed or added, and losses rewritten.
- */
-void kitchen_commit_to_session(struct kitchen *kitchen);
-#endif
 
 /* Nonzero if there is something obviously wrong with the selected ingredients,
  * to the extent that we should require the user to confirm before cooking.
@@ -76,5 +66,12 @@ struct stew {
 };
 void kitchen_cook(struct stew *stew,const struct kitchen *kitchen);
 void kitchen_commit_stew(const struct stew *stew);
+
+double clock_limit_by_day(int day);
+
+struct hourglass;
+struct hourglass *hourglass_new();
+void hourglass_del(struct hourglass *hg);
+void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t);
 
 #endif
