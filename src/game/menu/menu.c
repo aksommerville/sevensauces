@@ -278,30 +278,30 @@ void menu_move(struct menu *menu,int dx,int dy) {
   }
 }
 
-/* Render cursor.
+/* Render.
  */
+
+void menu_render_widgets(struct menu *menu) {
+  menu_clean(menu);
+  int i=0; for (;i<menu->widgetc;i++) {
+    struct widget *widget=menu->widgetv[i];
+    if (widget->type->render) widget->type->render(widget);
+  }
+}
  
-static void menu_render_cursor(struct menu *menu,int x,int y,int w,int h) {
+void menu_render_cursor(struct menu *menu) {
+  int x,y,w,h;
+  menu_get_cursor(&x,&y,&w,&h,menu);
+  if ((w<1)||(h<1)) return;
   graf_draw_rect(&g.graf,x,y,w,1,0xffff00ff);
   graf_draw_rect(&g.graf,x,y,1,h,0xffff00ff);
   graf_draw_rect(&g.graf,x+w-1,y,1,h,0xffff00ff);
   graf_draw_rect(&g.graf,x,y+h-1,w,1,0xffff00ff);
 }
 
-/* Render.
- */
-
 void menu_render(struct menu *menu) {
-  menu_clean(menu);
-  int i=0; for (;i<menu->widgetc;i++) {
-    struct widget *widget=menu->widgetv[i];
-    if (widget->type->render) widget->type->render(widget);
-  }
-  int cx,cy,cw,ch;
-  menu_get_cursor(&cx,&cy,&cw,&ch,menu);
-  if ((cw>0)&&(ch>0)) {
-    menu_render_cursor(menu,cx,cy,cw,ch);
-  }
+  menu_render_widgets(menu);
+  menu_render_cursor(menu);
 }
 
 /* Add widget.
@@ -342,6 +342,45 @@ int menu_remove_widget(struct menu *menu,struct widget *widget) {
       menu->dirty=1;
       return 0;
     }
+  }
+  return -1;
+}
+
+/* Remove and delete widget by index or id.
+ */
+
+int menu_delete_widget_at(struct menu *menu,int p) {
+  if (!menu) return -1;
+  if ((p<0)||(p>=menu->widgetc)) return -1;
+  struct widget *widget=menu->widgetv[p];
+  menu->widgetc--;
+  memmove(menu->widgetv+p,menu->widgetv+p+1,sizeof(void*)*(menu->widgetc-p));
+  widget->menu=0;
+  widget_del(widget);
+  if (widget==menu->focus.widget) {
+    menu->focus.widget=0;
+    menu->focus.t=1.0;
+  }
+  menu->dirty=1;
+  return 0;
+}
+
+int menu_delete_widget_id(struct menu *menu,int id) {
+  if (!menu) return -1;
+  int p=menu->widgetc;
+  while (p-->0) {
+    struct widget *widget=menu->widgetv[p];
+    if (widget->id!=id) continue;
+    menu->widgetc--;
+    memmove(menu->widgetv+p,menu->widgetv+p+1,sizeof(void*)*(menu->widgetc-p));
+    widget->menu=0;
+    widget_del(widget);
+    if (widget==menu->focus.widget) {
+      menu->focus.widget=0;
+      menu->focus.t=1.0;
+    }
+    menu->dirty=1;
+    return 0;
   }
   return -1;
 }

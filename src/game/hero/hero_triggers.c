@@ -55,6 +55,36 @@ void hero_check_touches(struct sprite *sprite) {
   }
 }
 
+/* Enter shop.
+ */
+ 
+static void hero_enter_shop(struct sprite *sprite,int16_t shopid) {
+  struct layer *layer=layer_spawn(&layer_type_shop);
+  if (layer_shop_setup(layer,shopid)<0) {
+    layer_pop(layer);
+    return;
+  }
+  SPRITE->facedx=0;
+  SPRITE->facedy=1;
+}
+
+/* Enter condensery.
+ */
+ 
+static void hero_enter_condensery(struct sprite *sprite) {
+  struct layer *layer=layer_spawn(&layer_type_condensery);
+  if (!layer) return;
+  SPRITE->facedx=0;
+  SPRITE->facedy=1;
+}
+
+/* Enter door.
+ */
+ 
+static void hero_enter_door(struct sprite *sprite,int16_t dstmapid,uint8_t dstcol,uint8_t dstrow) {
+  fprintf(stderr,"%s map:%d @%d,%d\n",__func__,dstmapid,dstcol,dstrow);//TODO
+}
+
 /* Callback from a deferred single-item harvest.
  */
  
@@ -131,9 +161,9 @@ void hero_check_cell(struct sprite *sprite) {
           g.world->clock=0.0;
         } return;
         
-      case CMD_map_shop: break;//TODO
-      case CMD_map_condensery: break;//TODO
-      case CMD_map_door: break;//TODO
+      case CMD_map_shop: hero_enter_shop(sprite,(poi->argv[2]<<8)|poi->argv[3]); return;
+      case CMD_map_condensery: hero_enter_condensery(sprite); return;
+      case CMD_map_door: hero_enter_door(sprite,(poi->argv[2]<<8)|poi->argv[3],poi->argv[4],poi->argv[5]); return;
     
     }
   }

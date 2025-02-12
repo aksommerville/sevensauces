@@ -1,0 +1,13 @@
+image image:shop 0 192
+greeting strings:ui (u16)49
+
+item (u8:item)apology 5
+item (u8:item)loveletter 5
+
+sellonly (u8:item)sunsauce 100
+sellonly (u8:item)brightsauce 100
+sellonly (u8:item)royaljelly 100
+sellonly (u8:item)flashsauce 100
+sellonly (u8:item)heavysauce 100
+sellonly (u8:item)fragilesauce 100
+sellonly (u8:item)forbidden 100

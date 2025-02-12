@@ -10,7 +10,7 @@
 
 #define SESSION_MAP_LIMIT 8 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
-#define SESSION_PLANT_LIMIT 64 /* Completely arbitrary. I think 64 will be pretty hard to reach. */
+#define SESSION_PLANT_LIMIT 256 /* Completely arbitrary. I've planted 177 in a one day, pushing it hard but surely not optimal. */
 #define SESSION_CUSTOMER_LIMIT 23 /* The rules and the kitchen layout are dependent on 23. Changing would be a big deal. */
 
 struct session {
@@ -26,6 +26,7 @@ struct session {
    * Session manages that for the most part.
    * You must point each plant to a 'seed' cell. If it's something else it will be ignored.
    * If you need to neutralize a plant, set its mapid or position OOB.
+   * Once it sprouts the next day, no limit.
    */
   struct plant {
     int mapid,x,y,itemid;

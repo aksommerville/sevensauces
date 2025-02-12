@@ -10,6 +10,7 @@
 struct menu;
 struct widget;
 struct widget_type;
+struct item;
 
 /* Menu: Top level interface.
  *************************************************************************/
@@ -44,16 +45,25 @@ void menu_activate(struct menu *menu); // SOUTH
 void menu_cancel(struct menu *menu); // WEST
 void menu_move(struct menu *menu,int dx,int dy); // LEFT|RIGHT|UP|DOWN
 
+/* If you have elements that need to go above main content but below the cursor (eg shop),
+ * render widgets, then your stuff, then cursor.
+ * Most consumers can use plain render.
+ */
 void menu_render(struct menu *menu);
+void menu_render_widgets(struct menu *menu);
+void menu_render_cursor(struct menu *menu);
 
 void menu_set_focus(struct menu *menu,struct widget *widget);
 void menu_focus_id(struct menu *menu,int id);
 void menu_force_focus_bounds(struct menu *menu); // Call if you move widgets. Terminates animation and resets cursor position.
 
 /* Adding or removing a widget hands off ownership.
+ * "delete" deletes the widget.
  */
 int menu_add_widget(struct menu *menu,struct widget *widget);
 int menu_remove_widget(struct menu *menu,struct widget *widget);
+int menu_delete_widget_at(struct menu *menu,int p);
+int menu_delete_widget_id(struct menu *menu,int wid);
 
 struct widget *menu_widget_by_id(const struct menu *menu,int id);
 
@@ -99,12 +109,15 @@ static void widget_set_bounds(struct widget *widget,int x,int y,int w,int h) {
 extern const struct widget_type widget_type_blotter;
 extern const struct widget_type widget_type_tile;
 extern const struct widget_type widget_type_decal;
+extern const struct widget_type widget_type_sale;
 
 int widget_blotter_setup(struct widget *widget,uint32_t rgba);
 int widget_tile_setup(struct widget *widget,int imageid,uint8_t tileid,uint8_t xform);
 int widget_decal_setup_image(struct widget *widget,int imageid,int x,int y,int w,int h); // (0,0,0,0) to use the entire image.
 int widget_decal_setup_text(struct widget *widget,const char *src,int srcc,int wlimit,uint32_t rgba); // (wlimit) zero for single-line
 int widget_decal_setup_string(struct widget *widget,int rid,int ix,int wlimit,uint32_t rgba); // ''
+void widget_decal_align(struct widget *widget,uint16_t align); // Centered (0) by default. Provide dpad button ids to change.
+void widget_decal_blink(struct widget *widget,int repc); // For highlighting. <0 to blink forever, 0 to stop blinking, or >0 blink so many times
 
 struct widget *widget_blotter_spawn(struct menu *menu,int x,int y,int w,int h,uint32_t rgba,void (*cb)(struct widget *widget),void *userdata);
 struct widget *widget_tile_spawn(struct menu *menu,int x,int y,int imageid,uint8_t tileid,uint8_t xform,void (*cb)(struct widget *widget),void *userdata);
@@ -112,5 +125,6 @@ struct widget *widget_decal_spawn_image(struct menu *menu,int x,int y,uint16_t a
 struct widget *widget_decal_spawn_partial(struct menu *menu,int x,int y,uint16_t align,int imageid,int srcx,int srcy,int srcw,int srch,void (*cb)(struct widget *widget),void *userdata);
 struct widget *widget_decal_spawn_text(struct menu *menu,int x,int y,uint16_t align,const char *src,int srcc,int wlimit,uint32_t rgba,void (*cb)(struct widget *widget),void *userdata);
 struct widget *widget_decal_spawn_string(struct menu *menu,int x,int y,uint16_t align,int rid,int ix,int wlimit,uint32_t rgba,void (*cb)(struct widget *widget),void *userdata);
+struct widget *widget_sale_spawn(struct menu *menu,int x,int y,const struct item *item,int price); // (price<0) if player is buying, >0 if she's selling
 
 #endif

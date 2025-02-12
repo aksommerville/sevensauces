@@ -23,6 +23,11 @@
 #define CMD_sprite_tile       0x21 /* u8:tileid u8:xform */
 #define CMD_sprite_type       0x22 /* u16:spritetype */
 
+#define CMD_shop_item       0x20 /* u8:itemid u8:price */
+#define CMD_shop_sellonly   0x21 /* u8:itemid u8:sellprice. Also use to override sale price, if after (item). */
+#define CMD_shop_image      0x40 /* u16:imageid u8:x u8:y. Dimensions 96x64 */
+#define CMD_shop_greeting   0x41 /* u16:stringsid u16:index */
+
 #define NS_tilesheet_physics     1
 #define NS_tilesheet_neighbors   0
 #define NS_tilesheet_family      0

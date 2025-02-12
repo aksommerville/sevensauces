@@ -332,6 +332,14 @@ void kitchen_commit_stew(const struct stew *stew) {
     g.session->inventory[*invp]=0;
   }
   
+  /* Acquire gold.
+   */
+  const int profit_per_head=2;
+  int profit=(stew->kcbeforec-stew->kcrmc)*profit_per_head;
+  if (profit>0) {
+    if ((g.session->gold+=profit)>999) g.session->gold+=profit;
+  }
+  
   /* Kill or lose customers.
    */
   g.session->lossc=0;

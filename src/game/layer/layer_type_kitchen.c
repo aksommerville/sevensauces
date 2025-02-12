@@ -334,6 +334,7 @@ static void _kitchen_render(struct layer *layer) {
    */
   int texid=texcache_get_image(&g.texcache,RID_image_kitchen_bg);
   graf_draw_decal(&g.graf,texid,0,0,0,0,FBW,FBH,0);
+  graf_flush(&g.graf);//XXX We shouldn't have to flush here but bg was getting evicted prematurely. That needs to be fixed in Egg, and the graf/texcache API is going to change a little.
   texid=texcache_get_image(&g.texcache,RID_image_kitchen_bits);
   
   /* Little Sister sits near the left edge of the cauldron.

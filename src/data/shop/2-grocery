@@ -1,0 +1,20 @@
+image image:shop 0 128
+greeting strings:ui (u16)51
+
+item (u8:item)carrot 3
+item (u8:item)potato 3
+item (u8:item)cabbage 3
+item (u8:item)banana 3
+item (u8:item)watermelon 4
+item (u8:item)pumpkin 4
+item (u8:item)noodles 6
+item (u8:item)bread 8
+item (u8:item)bouillon 10
+
+sellonly (u8:item)sunsauce 100
+sellonly (u8:item)brightsauce 100
+sellonly (u8:item)royaljelly 100
+sellonly (u8:item)flashsauce 100
+sellonly (u8:item)heavysauce 100
+sellonly (u8:item)fragilesauce 100
+sellonly (u8:item)forbidden 100

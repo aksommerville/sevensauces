@@ -1,0 +1,20 @@
+image image:shop 96 64
+greeting strings:ui (u16)52
+
+item (u8:item)rabbit 4
+item (u8:item)rat 1
+item (u8:item)quail 4
+item (u8:item)goat 8
+item (u8:item)pig 8
+item (u8:item)sheep 10
+item (u8:item)deer 10
+item (u8:item)cow 20
+item (u8:item)fish 4
+
+sellonly (u8:item)sunsauce 100
+sellonly (u8:item)brightsauce 100
+sellonly (u8:item)royaljelly 100
+sellonly (u8:item)flashsauce 100
+sellonly (u8:item)heavysauce 100
+sellonly (u8:item)fragilesauce 100
+sellonly (u8:item)forbidden 100

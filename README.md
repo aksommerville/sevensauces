@@ -5,13 +5,12 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 ## TODO
 
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
-- [ ] Freshen tree and trap tiles. Lots are missing, and we have a bunch with no item anymore. And all look bad.
 - [ ] Sort sprites before render
 - [ ] Doors
-- [ ] Money
-- [ ] Earn money each day, say $1/customer?
+- [x] Money
+- [x] Earn money each day, say $1/customer?
 - [ ] Transient entities: Vegetables, animals, stones...
-- [ ] Shops: Add a stationer, in addition to the ones from 20241217
+- [x] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Condensery
 - [ ] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
 - [ ] Kitchen: Advice.
@@ -34,6 +33,9 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Cat
 - [ ] An eighth bonus quest: Rescue the Princess. No sauce for winning, but the Princess will show up as a customer.
 - - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
+- [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
+- [ ] EOD: Show money earned (and move that into stew).
+- [ ] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
 
 ## Notes re starting over
 

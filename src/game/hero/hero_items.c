@@ -165,6 +165,10 @@ static void hero_cb_shovel(int invp,void *userdata) {
   struct sprite *sprite=userdata;
   if ((invp<0)||(invp>=16)) return;
   uint8_t itemid=g.session->inventory[invp];
+  if (!itemid) {
+    // It's silly to say "can't plant that" when they chose an empty slot. Just move on.
+    return;
+  }
   const struct item *item=itemv+itemid;
   if (!(item->flags&(1<<NS_itemflag_plant))) {
     struct layer *msg=layer_spawn(&layer_type_message);

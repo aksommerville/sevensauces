@@ -1,0 +1,20 @@
+image image:shop 96 128
+greeting strings:ui (u16)48
+
+item (u8:item)gumdrop 3
+item (u8:item)peppermint 3
+item (u8:item)licorice 4
+item (u8:item)chocolate 4
+item (u8:item)butterscotch 5
+# applepie, birthdaycake, and weddingcake I think will only be gettable by stealing.
+
+sellonly (u8:item)applepie 10
+sellonly (u8:item)birthdaycake 15
+sellonly (u8:item)weddingcake 20
+sellonly (u8:item)sunsauce 100
+sellonly (u8:item)brightsauce 100
+sellonly (u8:item)royaljelly 100
+sellonly (u8:item)flashsauce 100
+sellonly (u8:item)heavysauce 100
+sellonly (u8:item)fragilesauce 100
+sellonly (u8:item)forbidden 100
