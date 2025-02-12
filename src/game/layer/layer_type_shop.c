@@ -260,7 +260,9 @@ static int _shop_init(struct layer *layer) {
 static void shop_rebuild_dialogue_for_focus(struct layer *layer,struct widget *focus) {
   const struct item *item=0;
   int invp;
-  if (((invp=focus->id-SHOP_ID_BUY_ITEM)>=0)&&(invp<LAYER->itemc)) {
+  if (!focus) {
+    invp=-1;
+  } else if (((invp=focus->id-SHOP_ID_BUY_ITEM)>=0)&&(invp<LAYER->itemc)) {
     item=LAYER->itemv[invp];
   } else if (((invp=focus->id-SHOP_ID_SELL_ITEM)>=0)&&(invp<INVENTORY_SIZE)) {
     uint8_t itemid=g.session->inventory[invp];

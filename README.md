@@ -4,6 +4,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
+- [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Sort sprites before render
 - [x] Doors
