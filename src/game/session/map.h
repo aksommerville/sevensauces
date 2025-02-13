@@ -8,6 +8,7 @@
 #define MAP_H
 
 #define MAP_TRAPPABLE_LIMIT 8
+#define MAP_FORAGE_LIMIT 16
 
 struct map {
   int rid;
@@ -36,6 +37,18 @@ struct map {
     uint8_t odds;
   } trappablev[MAP_TRAPPABLE_LIMIT];
   int trappablec;
+  
+  /* Each of these should cause a sprite to spawn at load.
+   * It gets rebuilt each day by session.
+   * World may change positions or eliminate members at any time.
+   * (forageid) is an arbitrary integer unique across the day's forages.
+   */
+  struct forage {
+    uint8_t itemid;
+    uint8_t x,y;
+    uint8_t forageid;
+  } foragev[MAP_FORAGE_LIMIT];
+  int foragec;
 };
 
 void map_cleanup(struct map *map);

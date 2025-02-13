@@ -87,6 +87,7 @@ struct plant *session_add_plant(struct session *session);
 void session_apply_plants(struct session *session);
 
 void session_populate_traps(struct session *session);
+void session_reset_forage(struct session *session);
 
 /* Nonzero to continue playing. ie we have at least one customer or loss.
  * If this returns zero at the end of a night, it's Game Over.

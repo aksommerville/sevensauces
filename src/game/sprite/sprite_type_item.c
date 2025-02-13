@@ -1,6 +1,6 @@
 /* sprite_type_item.c
  * A loose item that you can pick up and add to inventory.
- * Spawn arg: u8 itemid, u24 reserved
+ * Spawn arg: u8 itemid, u8 forageid, u16 reserved
  */
  
 #include "game/sauces.h"
@@ -10,6 +10,7 @@
 
 struct sprite_item {
   struct sprite hdr;
+  int forageid;
 };
 
 #define SPRITE ((struct sprite_item*)sprite)
@@ -19,6 +20,7 @@ static void _item_del(struct sprite *sprite) {
 
 static int _item_init(struct sprite *sprite) {
   sprite->tileid=sprite->arg>>24;
+  SPRITE->forageid=(sprite->arg>>16)&0xff;
   return 0;
 }
 
@@ -29,6 +31,7 @@ static void item_cb_chosen(int invp,void *userdata) {
   uint8_t takeid=sprite->arg>>24;
   if (!dropid||!takeid) return; // Shouldn't have gotten this far, but please go no further.
   const struct item *item=itemv+dropid;
+  if (SPRITE->forageid) world_delete_forage(g.world,SPRITE->forageid);
   
   // With NS_itemusage_free, we must create a new sprite for the dropped item.
   if (item->usage==NS_itemusage_free) {
@@ -47,6 +50,7 @@ static void item_cb_chosen(int invp,void *userdata) {
 static void _item_hero_touch(struct sprite *sprite,struct sprite *hero) {
   int result=session_acquire_item(g.session,sprite->arg>>24,item_cb_chosen,sprite);
   if (result>0) {
+    if (SPRITE->forageid) world_delete_forage(g.world,SPRITE->forageid);
     sprite_kill_soon(sprite);
   }
 }

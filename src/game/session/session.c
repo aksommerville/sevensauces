@@ -391,6 +391,117 @@ void session_populate_traps(struct session *session) {
   }
 }
 
+/* Wipe forageables from all the maps and select a new distribution (start of day).
+ */
+ 
+static const uint8_t foragev[]={
+  NS_item_rabbit,
+  NS_item_rabbit,
+  NS_item_rabbit,
+  NS_item_rat,
+  NS_item_rat,
+  NS_item_rat,
+  NS_item_rat,
+  NS_item_quail,
+  NS_item_quail,
+  NS_item_quail,
+  NS_item_quail,
+  NS_item_quail,
+  NS_item_goat,
+  NS_item_goat,
+  NS_item_goat,
+  NS_item_pig,
+  NS_item_pig,
+  NS_item_sheep,
+  NS_item_sheep,
+  NS_item_sheep,
+  NS_item_deer,
+  NS_item_deer,
+  NS_item_deer,
+  NS_item_carrot,
+  NS_item_carrot,
+  NS_item_carrot,
+  NS_item_potato,
+  NS_item_potato,
+  NS_item_cabbage,
+  NS_item_cabbage,
+  NS_item_banana,
+  NS_item_banana,
+  NS_item_banana,
+  NS_item_watermelon,
+  NS_item_watermelon,
+  NS_item_pumpkin,
+  NS_item_pumpkin,
+  NS_item_buckeye,
+  NS_item_stone,
+  NS_item_stone,
+  NS_item_stone,
+  NS_item_stone,
+  NS_item_stone,
+  NS_item_stone,
+};
+ 
+static int session_get_forage(void *dstpp,int day) {
+  // Allowing that we might eventually have different forage sets for different days.
+  *(const void**)dstpp=foragev;
+  return sizeof(foragev);
+}
+ 
+static int map_is_forageable(struct map *map) {
+  struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
+  struct rom_command cmd;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode==CMD_map_forage) return 1;
+  }
+  return 0;
+}
+
+static void session_add_forage(struct map *map,uint8_t itemid,uint8_t forageid) {
+  if (map->foragec>MAP_FORAGE_LIMIT) return;
+  
+  // Forage can go on any diggable cell. If we don't find one in a timely manner, forget it.
+  int panic=50,x,y;
+  for (;;) {
+    if (--panic<0) return;
+    x=rand()%map->w;
+    y=rand()%map->h;
+    if (map->physics[map->v[y*map->w+x]]==NS_physics_diggable) break;
+  }
+  
+  struct forage *forage=map->foragev+map->foragec++;
+  forage->itemid=itemid;
+  forage->forageid=forageid;
+  forage->x=x;
+  forage->y=y;
+}
+ 
+void session_reset_forage(struct session *session) {
+
+  /* Blank all forage lists and collect the set of eligible maps.
+   */
+  struct map *fmapv[SESSION_MAP_LIMIT];
+  int fmapc=0;
+  struct map *map=session->mapv;
+  int i=session->mapc;
+  for (;i-->0;map++) {
+    map->foragec=0;
+    if (map_is_forageable(map)) fmapv[fmapc++]=map;
+  }
+  if (fmapc<1) return;
+  
+  /* Place each forage item in any of the maps.
+   * It's OK to skip an item. If the map refuses it, whatever.
+   * TODO We probably ought to refine the selection a bit further.
+   * eg Forest should accrue more forage than Desert, and Beach should get lobsters instead of squirrels...
+   */
+  const uint8_t *itemidv;
+  int itemidc=session_get_forage(&itemidv,session->day);
+  for (;itemidc-->0;itemidv++) {
+    int fmapp=rand()%fmapc;
+    session_add_forage(fmapv[fmapp],*itemidv,itemidc+1);
+  }
+}
+
 /* Summarize inventory.
  */
  

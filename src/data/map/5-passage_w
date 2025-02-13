@@ -29,3 +29,4 @@ door @6,0 map:13 @6,39 0x0000
 trappable (u8:item)rabbit 10
 trappable (u8:item)quail 10
 trappable (u8:item)deer 5
+forage

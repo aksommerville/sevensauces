@@ -4,6 +4,8 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
+- [ ] Losses are reappearing incorrectly.
+- [ ] Shops sometimes showing an incorrect texture by item description, when empty slot focussed.
 - [x] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
 - [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
@@ -11,7 +13,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [x] Doors
 - [x] Money
 - [x] Earn money each day, say $1/customer?
-- [ ] Transient entities: Vegetables, animals, stones...
+- [x] Transient entities: Vegetables, animals, stones...
 - [x] Shops: Add a stationer, in addition to the ones from 20241217
 - [ ] Talking NPCs.
 - [ ] Condensery

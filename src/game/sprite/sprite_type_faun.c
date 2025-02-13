@@ -2,7 +2,7 @@
  * All wild beasts associated with an item.
  * These can be picked up and stunned, and they'll run from the hero when she's near.
  * They move differently depending on itemid.
- * Arg: u8 itemid, u24 reserved
+ * Arg: u8 itemid, u8 forageid, u16 reserved
  */
  
 #include "game/sauces.h"
@@ -30,6 +30,7 @@ struct sprite_faun {
   double dx,dy;
   int col,row;
   struct sprite *paralyzer; // WEAK
+  int forageid;
 };
 
 #define SPRITE ((struct sprite_faun*)sprite)
@@ -46,6 +47,7 @@ static double frandrange(double lo,double hi) {
  
 static int _faun_init(struct sprite *sprite) {
   uint8_t itemid=sprite->arg>>24;
+  SPRITE->forageid=(sprite->arg>>16)&0xff;
   SPRITE->blackout=2.0;
   SPRITE->capture_clock=0.0;
   SPRITE->spooked=0;
@@ -199,6 +201,7 @@ static void faun_capture(struct sprite *sprite) {
   uint8_t itemid=sprite->arg>>24;
   int result=session_acquire_item(g.session,itemid,faun_cb_swap,sprite);
   if (result>0) {
+    if (SPRITE->forageid) world_delete_forage(g.world,SPRITE->forageid);
     sprite_kill_soon(sprite);
   }
 }
@@ -207,6 +210,11 @@ static void faun_capture(struct sprite *sprite) {
  */
  
 static void faun_choose_next_move(struct sprite *sprite,int panic) {
+
+  // Update the map's forage here, just to pay out the timing somewhat. It's fine to skip these for the most part.
+  if (SPRITE->forageid) {
+    world_update_forage(g.world,SPRITE->forageid,(int)sprite->x,(int)sprite->y);
+  }
   
   // When spooked, we have a constant speed and duration, and we run exactly opposite the hero.
   if (SPRITE->spooked) {
@@ -326,6 +334,7 @@ static void faun_check_traps(struct sprite *sprite) {
       );
     } else {
       g.world->map->v[cellp]=tileid;
+      if (SPRITE->forageid) world_delete_forage(g.world,SPRITE->forageid);
       sprite_kill_soon(sprite);
     }
   }

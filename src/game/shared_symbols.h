@@ -9,6 +9,7 @@
 #define NS_sys_mapw 20
 #define NS_sys_maph 15
 
+#define CMD_map_forage     0x01 /* --- */
 #define CMD_map_image      0x20 /* u16:imageid */
 #define CMD_map_hero       0x21 /* u16:pos */
 #define CMD_map_home       0x22 /* u16:pos */

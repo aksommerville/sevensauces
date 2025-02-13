@@ -25,6 +25,7 @@ static int _beginday_init(struct layer *layer) {
   
   session_apply_plants(g.session);
   session_populate_traps(g.session);
+  session_reset_forage(g.session);
   world_del(g.world);
   if (!(g.world=world_new())) return -1;
   

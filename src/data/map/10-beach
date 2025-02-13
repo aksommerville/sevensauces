@@ -44,3 +44,4 @@ door @0,36 map:passage_s @19,36 0x0000
 door @0,37 map:passage_s @19,37 0x0000
 trappable (u8:item)rabbit 10
 trappable (u8:item)quail 10
+forage

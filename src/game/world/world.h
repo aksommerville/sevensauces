@@ -36,4 +36,9 @@ int world_tileid_for_trapped_faun(const struct world *world,uint8_t itemid);
 int world_tileid_for_trap(const struct world *world);
 int world_tileid_for_seed(const struct world *world);
 
+/* These only work on the current map's forages.
+ */
+void world_update_forage(struct world *world,uint8_t forageid,int col,int row);
+void world_delete_forage(struct world *world,uint8_t forageid);
+
 #endif

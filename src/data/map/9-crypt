@@ -46,3 +46,4 @@ trappable (u8:item)rat 10
 trappable (u8:item)rabbit 10
 trappable (u8:item)quail 10
 trappable (u8:item)deer 5
+forage

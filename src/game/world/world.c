@@ -52,6 +52,27 @@ static void world_generate_loss_sprites(struct world *world) {
   }
 }
 
+/* Generate sprites for forages.
+ */
+ 
+static void world_generate_forage_sprites(struct world *world) {
+  struct forage *forage=world->map->foragev;
+  int i=world->map->foragec;
+  for (;i-->0;forage++) {
+    const struct item *item=itemv+forage->itemid;
+    double x=forage->x+0.5,y=forage->y+0.5;
+    switch (item->usage) {
+      case NS_itemusage_drop:
+      case NS_itemusage_stone: {
+          struct sprite *sprite=sprite_new(0,world->sprites,x,y,(forage->itemid<<24)|(forage->forageid<<16),RID_sprite_item);
+        } break;
+      case NS_itemusage_free: {
+          struct sprite *sprite=sprite_new(0,world->sprites,x,y,(forage->itemid<<24)|(forage->forageid<<16),RID_sprite_faun);
+        } break;
+    }
+  }
+}
+
 /* Load map: Initial read of command list.
  */
  
@@ -103,6 +124,7 @@ int world_load_map(struct world *world,int mapid) {
   }
   
   world_generate_loss_sprites(world);
+  world_generate_forage_sprites(world);
   
   return 0;
 }
@@ -156,4 +178,33 @@ int world_tileid_for_seed(const struct world *world) {
     if (*p==NS_physics_seed) return tileid;
   }
   return -1;
+}
+
+/* Public forage adjustments.
+ */
+ 
+void world_update_forage(struct world *world,uint8_t forageid,int col,int row) {
+  if (!world||!world->map) return;
+  if (col<0) col=0; else if (col>=world->map->w) col=world->map->w-1;
+  if (row<0) row=0; else if (row>=world->map->h) row=world->map->h-1;
+  int p=world->map->foragec;
+  while (p-->0) {
+    struct forage *forage=world->map->foragev+p;
+    if (forage->forageid!=forageid) continue;
+    forage->x=col;
+    forage->y=row;
+    return;
+  }
+}
+
+void world_delete_forage(struct world *world,uint8_t forageid) {
+  if (!world||!world->map) return;
+  int p=world->map->foragec;
+  while (p-->0) {
+    struct forage *forage=world->map->foragev+p;
+    if (forage->forageid!=forageid) continue;
+    world->map->foragec--;
+    memmove(forage,forage+1,sizeof(struct forage)*(world->map->foragec-p));
+    return;
+  }
 }
