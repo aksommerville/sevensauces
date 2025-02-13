@@ -45,9 +45,6 @@ static void _arrow_update(struct sprite *sprite,double elapsed) {
     if (sprite->arg&4) {
       // You can pick up the stone again and reuse it. The tile used by item sprites is oriented toward the bottom of the cell, hence (y-something).
       struct sprite *itspr=sprite_new(0,sprite->owner,sprite->x,sprite->y-0.400,NS_item_stone<<24,RID_sprite_item);
-      if (itspr) {
-        sprite_item_no_blackout(itspr);
-      }
     }
     sprite_kill_soon(sprite);
     return;

@@ -10,7 +10,6 @@
 
 struct sprite_item {
   struct sprite hdr;
-  double init_time;
 };
 
 #define SPRITE ((struct sprite_item*)sprite)
@@ -20,7 +19,6 @@ static void _item_del(struct sprite *sprite) {
 
 static int _item_init(struct sprite *sprite) {
   sprite->tileid=sprite->arg>>24;
-  SPRITE->init_time=g.world->clock;
   return 0;
 }
 
@@ -43,15 +41,10 @@ static void item_cb_chosen(int invp,void *userdata) {
   // All others behave like NS_itemusage_drop: Swap IDs with me.
   sprite->arg=(sprite->arg&0x00ffffff)|(dropid<<24);
   sprite->tileid=dropid;
-  SPRITE->init_time=g.world->clock;
   g.session->inventory[invp]=takeid;
 }
 
 static void _item_hero_touch(struct sprite *sprite,struct sprite *hero) {
-  double elapsed=SPRITE->init_time-g.world->clock;
-  if (elapsed<1.0) {
-    return;
-  }
   int result=session_acquire_item(g.session,sprite->arg>>24,item_cb_chosen,sprite);
   if (result>0) {
     sprite_kill_soon(sprite);
@@ -65,8 +58,3 @@ const struct sprite_type sprite_type_item={
   .init=_item_init,
   .hero_touch=_item_hero_touch,
 };
-
-void sprite_item_no_blackout(struct sprite *sprite) {
-  if (!sprite||(sprite->type!=&sprite_type_item)) return;
-  SPRITE->init_time=g.world->clock+100.0;
-}

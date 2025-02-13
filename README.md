@@ -4,7 +4,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [ ] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
+- [x] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
 - [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [x] Sort sprites before render

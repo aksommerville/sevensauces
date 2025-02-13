@@ -145,8 +145,6 @@ void sprite_hero_engage_grapple(struct sprite *sprite);
 void sprite_hero_release_grapple(struct sprite *sprite);
 int sprite_hero_is_apologizing(struct sprite *sprite,struct sprite *apologizee);
 
-void sprite_item_no_blackout(struct sprite *sprite);
-
 // Daze remains locked to master's position, and deletes self when master's tileid changes. You must set the initial position.
 // If you're not going to change tileid, you can manually drop all dazes for a given master too.
 void sprite_daze_setup(struct sprite *sprite,struct sprite *master);
