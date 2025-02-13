@@ -11,6 +11,16 @@
  
 void session_del(struct session *session) {
   if (!session) return;
+  int i=session->mapc;
+  while (i-->0) map_cleanup(session->mapv+i);
+  if (session->tilesheetv) {
+    while (session->tilesheetc-->0) {
+      struct tilesheet *tilesheet=session->tilesheetv+session->tilesheetc;
+      if (tilesheet->physics) free(tilesheet->physics);
+      if (tilesheet->itemid) free(tilesheet->itemid);
+    }
+    free(session->tilesheetv);
+  }
   free(session);
 }
 
@@ -30,6 +40,31 @@ struct customer *session_add_customer(struct session *session,int race) {
   return customer;
 }
 
+/* Select (mapid,x,y) for a new loss.
+ * I'm thinking it will always be the village map, and any vacant cell.
+ */
+ 
+static void session_select_loss_location(struct session *session,struct loss *loss) {
+  loss->mapid=RID_map_village;
+  struct map *map=session_get_map(session,loss->mapid);
+  if (!map) { loss->mapid=0; return; }
+  uint16_t candidatev[1024];
+  int candidatec=0;
+  const uint8_t *p=map->v;
+  int i=map->w*map->h;
+  for (;i-->0;p++) {
+    uint8_t physics=map->physics[*p];
+    if (physics==NS_physics_diggable) { // "diggable" not "vacant". This way they never end up in doorways or other special spots.
+      candidatev[candidatec]=p-map->v;
+      if (++candidatec>=sizeof(candidatev)) break;
+    }
+  }
+  if (candidatec<1) { loss->mapid=0; return; }
+  int choice=candidatev[rand()%candidatec];
+  loss->x=choice%map->w;
+  loss->y=choice/map->w;
+}
+
 /* Remove customer.
  */
  
@@ -46,9 +81,7 @@ void session_lose_customer_at(struct session *session,int p) {
     struct loss *loss=session->lossv+session->lossc++;
     memset(loss,0,sizeof(struct loss));
     loss->race=customer->race;
-    loss->mapid=RID_map_village;//TODO loss location
-    loss->x=10;
-    loss->y=10;
+    session_select_loss_location(session,loss);
   }
   customer->race=0;
 }
@@ -62,6 +95,58 @@ void session_commit_removals(struct session *session) {
       memmove(customer,customer+1,sizeof(struct customer)*(session->customerc-i));
     }
   }
+}
+
+void session_unlose_customer_at(struct session *session,int lossp) {
+  if (!session||(lossp<0)||(lossp>=session->lossc)) return;
+  struct loss *loss=session->lossv+lossp;
+  if (!loss->race) return;
+  session_add_customer(session,loss->race);
+  loss->race=0;
+}
+
+/* Add tilesheet.
+ */
+ 
+static int session_add_tilesheet(struct session *session,int rid,const uint8_t *src,int srcc) {
+  struct rom_tilesheet_reader reader;
+  if (rom_tilesheet_reader_init(&reader,src,srcc)<0) return -1;
+  if (session->tilesheetc>=session->tilesheeta) {
+    int na=session->tilesheeta+16;
+    if (na>INT_MAX/sizeof(struct tilesheet)) return -1;
+    void *nv=realloc(session->tilesheetv,sizeof(struct tilesheet)*na);
+    if (!nv) return -1;
+    session->tilesheetv=nv;
+    session->tilesheeta=na;
+  }
+  struct tilesheet *tilesheet=session->tilesheetv+session->tilesheetc++;
+  memset(tilesheet,0,sizeof(struct tilesheet));
+  tilesheet->rid=rid;
+  if (!(tilesheet->physics=calloc(1,256))) return -1;
+  if (!(tilesheet->itemid=calloc(1,256))) return -1;
+  struct rom_tilesheet_entry entry;
+  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
+    switch (entry.tableid) {
+      case NS_tilesheet_physics: memcpy(tilesheet->physics+entry.tileid,entry.v,entry.c); break;
+      case NS_tilesheet_item: memcpy(tilesheet->itemid+entry.tileid,entry.v,entry.c); break;
+    }
+  }
+  return 0;
+}
+
+/* Find tilesheet.
+ */
+ 
+static struct tilesheet *session_get_tilesheet(struct session *session,int rid) {
+  int lo=0,hi=session->tilesheetc;
+  while (lo<hi) {
+    int ck=(lo+hi)>>1;
+    struct tilesheet *tilesheet=session->tilesheetv+ck;
+         if (rid<tilesheet->rid) hi=ck;
+    else if (rid>tilesheet->rid) lo=ck+1;
+    else return tilesheet;
+  }
+  return 0;
 }
 
 /* Init, the fallible parts.
@@ -84,6 +169,18 @@ static int session_init(struct session *session) {
           struct map *map=session->mapv+session->mapc++;
           if (map_init(map,res->rid,res->v,res->c)<0) return -1;
         } break;
+      case EGG_TID_tilesheet: {
+          if (session_add_tilesheet(session,res->rid,res->v,res->c)<0) return -1;
+        } break;
+    }
+  }
+  struct map *map=session->mapv;
+  int i=session->mapc;
+  for (;i-->0;map++) {
+    struct tilesheet *tilesheet=session_get_tilesheet(session,map->imageid);
+    if (tilesheet) {
+      map->physics=tilesheet->physics;
+      map->itemid=tilesheet->itemid;
     }
   }
   

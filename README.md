@@ -6,7 +6,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 - [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
-- [ ] Sort sprites before render
+- [x] Sort sprites before render
 - [x] Doors
 - [x] Money
 - [x] Earn money each day, say $1/customer?
@@ -39,6 +39,10 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
 - [ ] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
 - [ ] Door transitions
+- [ ] Assistance near home:
+- - Reveal the Daily Special.
+- - Tell composition of tonight's party.
+- - Recommend a recipe.
 
 ## Notes re starting over
 

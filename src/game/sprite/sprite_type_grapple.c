@@ -60,7 +60,7 @@ static void grapple_check_world(struct sprite *sprite) {
   if ((col>=0)&&(row>=0)&&(col<g.world->map->w)&&(row<g.world->map->h)) {
     int cellp=row*g.world->map->w+col;
     uint8_t tileid=g.world->map->v[cellp];
-    uint8_t physics=g.world->physics[tileid];
+    uint8_t physics=g.world->map->physics[tileid];
     switch (physics) {
       case NS_physics_grapplable: {
           egg_play_sound(RID_sound_grapple_pull);

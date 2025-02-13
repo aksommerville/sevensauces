@@ -12,9 +12,6 @@ struct sprites;
 
 struct world {
   struct map *map; // WEAK, owned by session
-  uint8_t physics[256];
-  uint8_t tsitemid[256];
-  int map_imageid;
   int viewx,viewy; // Position in world pixels of the last render.
   struct sprites *sprites; // STRONG. Stays alive, but we empty it on map changes, except for the hero.
   //TODO transient flora and fauna -- need a level of persistence above sprite

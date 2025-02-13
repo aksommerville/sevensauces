@@ -49,7 +49,7 @@ static void world_render_map(struct world *world) {
   int rowa=world->viewy/NS_sys_tilesize; if (rowa<0) rowa=0;
   int rowz=(world->viewy+FBH-1)/NS_sys_tilesize; if (rowz>=world->map->h) rowz=world->map->h-1;
   if ((cola>colz)||(rowa>rowz)) return;
-  int texid=texcache_get_image(&g.texcache,world->map_imageid);
+  int texid=texcache_get_image(&g.texcache,world->map->imageid);
   graf_draw_tile_buffer(&g.graf,texid,
     cola*NS_sys_tilesize-world->viewx+(NS_sys_tilesize>>1),
     rowa*NS_sys_tilesize-world->viewy+(NS_sys_tilesize>>1),

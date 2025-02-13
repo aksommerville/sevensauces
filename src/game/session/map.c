@@ -2,6 +2,8 @@
 #include "map.h"
 #include "opt/rom/rom.h"
 
+const uint8_t dummy_tilesheet[256]={0};
+
 /* Cleanup.
  */
  
@@ -47,7 +49,7 @@ static struct poi *map_poiv_insert(struct map *map,int p,int col,int row) {
   return poi;
 }
 
-/* Load POI.
+/* Load POI or other initial commands.
  */
  
 static int map_load_poi(struct map *map) {
@@ -69,6 +71,7 @@ static int map_load_poi(struct map *map) {
           poi->argv=cmd.argv;
           poi->argc=cmd.argc;
         } break;
+      case CMD_map_image: map->imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
     }
   }
   return 0;
@@ -90,6 +93,8 @@ int map_init(struct map *map,int rid,const void *src,int srcc) {
   map->ro=rmap.v;
   map->cmdv=rmap.cmdv;
   map->cmdc=rmap.cmdc;
+  map->physics=dummy_tilesheet;
+  map->itemid=dummy_tilesheet;
   if (map_load_poi(map)<0) {
     map_cleanup(map);
     return -1;

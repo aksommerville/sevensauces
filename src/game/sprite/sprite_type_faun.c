@@ -315,7 +315,7 @@ static void faun_check_traps(struct sprite *sprite) {
   if ((col<0)||(row<0)||(col>=g.world->map->w)||(row>=g.world->map->h)) return;
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   if (physics==NS_physics_trap) {
     uint8_t itemid=sprite->arg>>24;
     int tileid=world_tileid_for_trapped_faun(g.world,itemid);

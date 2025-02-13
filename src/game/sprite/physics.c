@@ -30,10 +30,10 @@ int sprite_rectify_physics(struct sprite *sprite) {
   //TODO Need a more refined sense of which physics values are impassable. Will become important if we implement a broom.
   uint8_t solidmask=(1<<NS_physics_solid)|(1<<NS_physics_water)|(1<<NS_physics_grapplable);
   uint8_t hits=( // 8,4,2,1=NW,NE,SW,SE
-    (((1<<g.world->physics[cellv[0]])&solidmask)?8:0)|
-    (((1<<g.world->physics[cellv[1]])&solidmask)?4:0)|
-    (((1<<g.world->physics[cellv[g.world->map->w]])&solidmask)?2:0)|
-    (((1<<g.world->physics[cellv[g.world->map->w+1]])&solidmask)?1:0)|
+    (((1<<g.world->map->physics[cellv[0]])&solidmask)?8:0)|
+    (((1<<g.world->map->physics[cellv[1]])&solidmask)?4:0)|
+    (((1<<g.world->map->physics[cellv[g.world->map->w]])&solidmask)?2:0)|
+    (((1<<g.world->map->physics[cellv[g.world->map->w+1]])&solidmask)?1:0)|
   0);
   
   /* There are 16 possible dispositions for the earth beneath us.

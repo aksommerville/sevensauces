@@ -11,6 +11,7 @@ struct sprites {
   struct sprite **deathrow; // WEAK, also listed in (v).
   int deathrowc,deathrowa;
   struct sprite *hero; // WEAK
+  int sortdir;
 };
 
 #endif

@@ -50,6 +50,7 @@
 #define NS_spritetype_daze      5
 #define NS_spritetype_faun      6
 #define NS_spritetype_grapple   7
+#define NS_spritetype_loss      8
 #define FOR_EACH_SPRITE_TYPE \
   _(dummy) \
   _(hero) \
@@ -57,7 +58,8 @@
   _(arrow) \
   _(daze) \
   _(faun) \
-  _(grapple)
+  _(grapple) \
+  _(loss)
   
 #define NS_race_man       1
 #define NS_race_rabbit    2

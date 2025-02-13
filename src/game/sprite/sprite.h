@@ -68,6 +68,7 @@ struct sprite {
   int imageid; // For generic render.
   uint8_t tileid,xform; // For generic render.
   int grapplable;
+  int layer;
 };
 
 /* Deletes the sprite immediately and unlists from its owner.
@@ -142,6 +143,7 @@ void sprite_hero_action(struct sprite *sprite);
 void sprite_hero_end_action(struct sprite *sprite);
 void sprite_hero_engage_grapple(struct sprite *sprite);
 void sprite_hero_release_grapple(struct sprite *sprite);
+int sprite_hero_is_apologizing(struct sprite *sprite,struct sprite *apologizee);
 
 void sprite_item_no_blackout(struct sprite *sprite);
 

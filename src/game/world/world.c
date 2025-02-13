@@ -40,24 +40,20 @@ struct world *world_new() {
   return world;
 }
 
-/* Load tilesheet, after initial read of map.
+/* Generate a sprite for any loss on the current map.
  */
  
-static int world_load_tilesheet(struct world *world) {
-  memset(world->physics,0,sizeof(world->physics));
-  memset(world->tsitemid,0,sizeof(world->tsitemid));
-  const void *src=0;
-  int srcc=sauces_res_get(&src,EGG_TID_tilesheet,world->map_imageid);
-  struct rom_tilesheet_reader reader;
-  if (rom_tilesheet_reader_init(&reader,src,srcc)<0) return -1;
-  struct rom_tilesheet_entry entry;
-  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
-    switch (entry.tableid) {
-      case NS_tilesheet_physics: memcpy(world->physics+entry.tileid,entry.v,entry.c); break;
-      case NS_tilesheet_item: memcpy(world->tsitemid+entry.tileid,entry.v,entry.c); break;
+static void world_generate_loss_sprites(struct world *world) {
+  fprintf(stderr,"%s mapid=%d lossc=%d\n",__func__,world->map->rid,g.session->lossc);
+  int i=g.session->lossc;
+  struct loss *loss=g.session->lossv+i-1;
+  for (;i-->0;loss--) {
+    if (loss->mapid!=world->map->rid) continue;
+    struct sprite *sprite=sprite_new(&sprite_type_loss,world->sprites,loss->x+0.5,loss->y+0.5,loss->race|(i<<8),0);
+    if (sprite) {
+      fprintf(stderr,"Generated loss sprite at %d,%d\n",loss->x,loss->y);
     }
   }
-  return 0;
 }
 
 /* Load map: Initial read of command list.
@@ -72,7 +68,7 @@ static int world_read_initial_map_commands(struct world_load_map *ctx,struct wor
   struct rom_command cmd;
   while (rom_command_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
-      case CMD_map_image: world->map_imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+      case CMD_map_image: world->map->imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
       case CMD_map_hero: ctx->herox=cmd.argv[0]; ctx->heroy=cmd.argv[1]; break;
       case CMD_map_sprite: {
           double x=cmd.argv[0]+0.5;
@@ -109,7 +105,8 @@ int world_load_map(struct world *world,int mapid) {
   if (!hero) {
     hero=sprite_new(&sprite_type_hero,world->sprites,ctx.herox+0.5,ctx.heroy+0.5,0,0);
   }
-  world_load_tilesheet(world);
+  
+  world_generate_loss_sprites(world);
   
   return 0;
 }
@@ -133,12 +130,12 @@ void world_commit_to_session(struct world *world) {
  
 int world_tileid_for_trapped_faun(const struct world *world,uint8_t itemid) {
   if (!itemid) return -1;
-  const uint8_t *p=world->tsitemid;
+  const uint8_t *p=world->map->itemid;
   int tileid=0;
   for (;tileid<0x100;tileid++,p++) {
     if (*p==itemid) {
-      if (world->physics[tileid]!=NS_physics_harvest) {
-        fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x but physics is not NS_physics_harvest (%d). Can't use it.\n",world->map_imageid,tileid,itemid,world->physics[tileid]);
+      if (world->map->physics[tileid]!=NS_physics_harvest) {
+        fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x but physics is not NS_physics_harvest (%d). Can't use it.\n",world->map->imageid,tileid,itemid,world->map->physics[tileid]);
         continue;
       }
       return tileid;
@@ -148,7 +145,7 @@ int world_tileid_for_trapped_faun(const struct world *world,uint8_t itemid) {
 }
 
 int world_tileid_for_trap(const struct world *world) {
-  const uint8_t *p=world->physics;
+  const uint8_t *p=world->map->physics;
   int tileid=0;
   for (;tileid<0x100;tileid++,p++) {
     if (*p==NS_physics_trap) return tileid;
@@ -157,7 +154,7 @@ int world_tileid_for_trap(const struct world *world) {
 }
 
 int world_tileid_for_seed(const struct world *world) {
-  const uint8_t *p=world->physics;
+  const uint8_t *p=world->map->physics;
   int tileid=0;
   for (;tileid<0x100;tileid++,p++) {
     if (*p==NS_physics_seed) return tileid;

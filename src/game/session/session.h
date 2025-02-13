@@ -10,7 +10,7 @@
 
 #define SESSION_MAP_LIMIT 16 /* Can change freely but must be at least the count of map resources. */
 #define INVENTORY_SIZE 16 /* Do not change. */
-#define SESSION_PLANT_LIMIT 256 /* Completely arbitrary. I've planted 177 in a one day, pushing it hard but surely not optimal. */
+#define SESSION_PLANT_LIMIT 256 /* Completely arbitrary. I've planted 177 in one day, pushing it hard but surely not optimal. */
 #define SESSION_CUSTOMER_LIMIT 23 /* The rules and the kitchen layout are dependent on 23. Changing would be a big deal. */
 
 struct session {
@@ -21,6 +21,13 @@ struct session {
   
   struct map mapv[SESSION_MAP_LIMIT];
   int mapc;
+  
+  struct tilesheet {
+    int rid;
+    uint8_t *physics;
+    uint8_t *itemid;
+  } *tilesheetv;
+  int tilesheetc,tilesheeta;
   
   /* Plants get recorded here one day, and applied at the start of the next.
    * Session manages that for the most part.
@@ -67,6 +74,7 @@ struct customer *session_add_customer(struct session *session,int race); // race
 void session_remove_customer_at(struct session *session,int p);
 void session_lose_customer_at(struct session *session,int p);
 void session_commit_removals(struct session *session);
+void session_unlose_customer_at(struct session *session,int lossp);
 
 /* Acquire a new item.
  * If you provide either of (cb,userdata), we are allowed to create passive feedback. (sound effect and toast).

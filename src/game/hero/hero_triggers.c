@@ -103,7 +103,7 @@ static void hero_cb_harvest(int invp,void *userdata) {
   if (!itemid_drop) return;
   int cellp=SPRITE->row*g.world->map->w+SPRITE->col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t itemid_take=g.world->tsitemid[tileid];
+  uint8_t itemid_take=g.world->map->itemid[tileid];
   const struct item *item=itemv+itemid_take;
   if (item->harvestq!=1) return; // Impossible but stay safe.
   g.world->map->v[cellp]=g.world->map->ro[cellp];
@@ -123,14 +123,14 @@ void hero_check_cell(struct sprite *sprite) {
   SPRITE->row=row;
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   switch (physics) {
   
     case NS_physics_harvest: {
-        uint8_t itemid=g.world->tsitemid[tileid];
+        uint8_t itemid=g.world->map->itemid[tileid];
         const struct item *item=itemv+itemid;
         if (!item->harvestq) {
-          fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x with invalid harvestq=%d\n",g.world->map_imageid,tileid,itemid,item->harvestq);
+          fprintf(stderr,"tilesheet:%d: Tile 0x%02x has itemid 0x%02x with invalid harvestq=%d\n",g.world->map->imageid,tileid,itemid,item->harvestq);
           break;
         }
         // Single-harvest items like animal traps are easy.

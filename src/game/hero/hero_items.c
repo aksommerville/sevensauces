@@ -140,7 +140,7 @@ static void hero_begin_fishpole(struct sprite *sprite) {
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   if (physics!=NS_physics_water) {
     egg_play_sound(RID_sound_reject);
     return;
@@ -183,7 +183,7 @@ static void hero_cb_shovel(int invp,void *userdata) {
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   if (physics!=NS_physics_diggable) {
     // Shouldn't happen; we checked before the query.
     return;
@@ -214,13 +214,13 @@ static void hero_begin_shovel(struct sprite *sprite) {
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   if (physics!=NS_physics_diggable) {
     egg_play_sound(RID_sound_reject);
     return;
   }
   if (world_tileid_for_seed(g.world)<0) {
-    fprintf(stderr,"tilesheet:%d has no seed tile\n",g.world->map_imageid);
+    fprintf(stderr,"tilesheet:%d has no seed tile\n",g.world->map->imageid);
     return;
   }
   struct layer *pause=layer_spawn(&layer_type_pause);
@@ -248,7 +248,7 @@ static void hero_begin_trap(struct sprite *sprite) {
   }
   int cellp=row*g.world->map->w+col;
   uint8_t tileid=g.world->map->v[cellp];
-  uint8_t physics=g.world->physics[tileid];
+  uint8_t physics=g.world->map->physics[tileid];
   // Target cell has to be diggable -- those are the tiles we've arranged to be visually replaceable by a trap (or a hole).
   if (physics!=NS_physics_diggable) {
     egg_play_sound(RID_sound_reject);
@@ -256,7 +256,7 @@ static void hero_begin_trap(struct sprite *sprite) {
   }
   int ntileid=world_tileid_for_trap(g.world);
   if (ntileid<0) {
-    fprintf(stderr,"tilesheet:%d does not contain a trap tile\n",g.world->map_imageid);
+    fprintf(stderr,"tilesheet:%d does not contain a trap tile\n",g.world->map->imageid);
     // No sound effect here; this is a technical error. sorry.
     return;
   }
@@ -346,4 +346,22 @@ void hero_update_item(struct sprite *sprite,double elapsed) {
     case NS_item_apology: hero_update_letter(sprite,elapsed,NS_item_apology); break;
     case NS_item_loveletter: hero_update_letter(sprite,elapsed,NS_item_apology); break;
   }
+}
+
+/* Public check for apology card.
+ */
+ 
+int sprite_hero_is_apologizing(struct sprite *sprite,struct sprite *apologizee) {
+  if (!sprite||(sprite->type!=&sprite_type_hero)) return 0;
+  if (!apologizee) return 0;
+  if (SPRITE->item_in_use!=NS_item_apology) return 0;
+  double l=sprite->x-1.0+SPRITE->facedx;
+  double r=sprite->x+1.0+SPRITE->facedx;
+  if (apologizee->x<l) return 0;
+  if (apologizee->x>r) return 0;
+  double t=sprite->y-1.0+SPRITE->facedy;
+  double b=sprite->y+1.0+SPRITE->facedy;
+  if (apologizee->y<t) return 0;
+  if (apologizee->y>b) return 0;
+  return 1;
 }

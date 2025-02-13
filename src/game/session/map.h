@@ -14,6 +14,9 @@ struct map {
   const uint8_t *ro; // Matches (v), but the original read-only content.
   const uint8_t *cmdv;
   int cmdc;
+  int imageid;
+  const uint8_t *physics; // From tilesheet.
+  const uint8_t *itemid;
   
   /* Commands that may be triggered by a hero step are yoinked at load time and stored here,
    * sorted by (row,col).

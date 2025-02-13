@@ -174,13 +174,49 @@ void sprites_update(struct sprites *sprites,double elapsed) {
   //TODO Generic update processing. Physics?
 }
 
+/* Single-pass bubble sort for render order.
+ */
+ 
+static int sprites_rendercmp(const struct sprite *a,const struct sprite *b) {
+  if (a->layer<b->layer) return -1;
+  if (a->layer>b->layer) return 1;
+  if (a->y<b->y) return -1;
+  if (a->y>b->y) return 1;
+  return 0;
+}
+ 
+static void sprites_sort_1(struct sprites *sprites) {
+  if (sprites->c<2) return;
+  int first,last,i,d;
+  if (sprites->sortdir==1) {
+    first=0;
+    last=sprites->c-1;
+    d=1;
+    sprites->sortdir=-1;
+  } else {
+    first=sprites->c-1;
+    last=0;
+    d=-1;
+    sprites->sortdir=1;
+  }
+  for (i=first;i!=last;i+=d) {
+    struct sprite *a=sprites->v[i];
+    struct sprite *b=sprites->v[i+d];
+    int cmp=sprites_rendercmp(a,b);
+    if (cmp==d) {
+      sprites->v[i]=b;
+      sprites->v[i+d]=a;
+    }
+  }
+}
+
 /* Render.
  */
  
 void sprites_render(struct sprites *sprites) {
   
-  //TODO Sort by layer and vertical.
-  
+  sprites_sort_1(sprites);
+
   int xlo=-NS_sys_tilesize; // Assume anything whose center is more than a tile offscreen is completely invisible.
   int ylo=-NS_sys_tilesize;
   int xhi=FBW+NS_sys_tilesize;
@@ -225,7 +261,7 @@ void sprites_find_spawn_position(double *x,double *y,const struct sprites *sprit
     int row=rowa; for (;row<=rowz;row++,prow+=g.world->map->w) {
       const uint8_t *p=prow;
       int col=cola; for (;col<=colz;col++,p++) {
-        uint8_t physics=g.world->physics[*p];
+        uint8_t physics=g.world->map->physics[*p];
         switch (physics) {
           case NS_physics_solid:
           case NS_physics_water:
@@ -266,7 +302,7 @@ void sprites_find_spawn_position(double *x,double *y,const struct sprites *sprit
   int rowi=0; for (;rowi<rowc;rowi++,prow+=g.world->map->w) {
     const uint8_t *p=prow;
     int coli=0; for (;coli<colc;coli++,p++) {
-      uint8_t physics=g.world->physics[*p];
+      uint8_t physics=g.world->map->physics[*p];
       switch (physics) {
         case NS_physics_solid:
         case NS_physics_water:
