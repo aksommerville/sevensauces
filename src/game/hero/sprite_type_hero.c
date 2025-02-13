@@ -43,7 +43,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     const double walkspeed=6.0; // m/s
     sprite->x+=walkspeed*elapsed*SPRITE->walkdx;
     sprite->y+=walkspeed*elapsed*SPRITE->walkdy;
-    sprite_rectify_physics(sprite);
+    sprite_rectify_physics(sprite,0.5);
   }
   
   hero_update_item(sprite,elapsed);

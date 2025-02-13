@@ -111,6 +111,8 @@ static void _grapple_update(struct sprite *sprite,double elapsed) {
           if ((SPRITE->pumpkin->type==&sprite_type_item)||(SPRITE->pumpkin->type==&sprite_type_faun)) {
             uint8_t itemid=SPRITE->pumpkin->arg>>24; // True for both types.
             if (session_acquire_item(g.session,itemid,0,"passive")>0) {
+              uint8_t forageid=(SPRITE->pumpkin->arg>>16)&0xff; // True for both types.
+              if (forageid) world_delete_forage(g.world,forageid);
               sprite_kill_soon(SPRITE->pumpkin);
               SPRITE->pumpkin=0;
             }

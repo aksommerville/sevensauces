@@ -6,15 +6,16 @@
 /* Detect and escape map collisions.
  */
  
-int sprite_rectify_physics(struct sprite *sprite) {
+int sprite_rectify_physics(struct sprite *sprite,double border_radius) {
   int changed=0;
   
   /* First, force sprite into the map's boundaries.
    */
-  if (sprite->x<0.5) { sprite->x=0.5; changed=1; }
-  else if (sprite->x>g.world->map->w-0.5) { sprite->x=g.world->map->w-0.5; changed=1; }
-  if (sprite->y<0.5) { sprite->y=0.5; changed=1; }
-  else if (sprite->y>g.world->map->h-0.5) { sprite->y=g.world->map->h-0.5; changed=1; }
+  if (border_radius<0.5) border_radius=0.5;
+  if (sprite->x<border_radius) { sprite->x=border_radius; changed=1; }
+  else if (sprite->x>g.world->map->w-border_radius) { sprite->x=g.world->map->w-border_radius; changed=1; }
+  if (sprite->y<border_radius) { sprite->y=border_radius; changed=1; }
+  else if (sprite->y>g.world->map->h-border_radius) { sprite->y=g.world->map->h-border_radius; changed=1; }
   
   /* Since every sprite has a radius 0.5, there can't be more than 4 cells involved.
    * Can we cheese it and make things easier?

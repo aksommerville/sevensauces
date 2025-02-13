@@ -28,6 +28,10 @@ static void _decal_del(struct widget *widget) {
 
 static void _decal_render(struct widget *widget) {
 
+  int texid=WIDGET->texid;
+  if ((texid<1)&&(widget->imageid>0)) texid=texcache_get_image(&g.texcache,widget->imageid);
+  if (texid<0) return;
+
   if (WIDGET->blinkc) {
     if (++(WIDGET->blink_clock)>=DECAL_BLINK_PERIOD) {
       if (WIDGET->blinkc>0) WIDGET->blinkc--;
@@ -35,8 +39,7 @@ static void _decal_render(struct widget *widget) {
     }
     if (WIDGET->blink_clock<DECAL_BLINK_DUTY_CYCLE) graf_set_alpha(&g.graf,DECAL_BLINK_ALPHA);
   }
-
-  int texid=WIDGET->texid?WIDGET->texid:texcache_get_image(&g.texcache,widget->imageid);
+  
   int dstx,dsty;
   switch (WIDGET->align&(EGG_BTN_LEFT|EGG_BTN_RIGHT)) {
     case EGG_BTN_LEFT: dstx=0; break;

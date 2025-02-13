@@ -100,9 +100,9 @@ void session_commit_removals(struct session *session) {
 void session_unlose_customer_at(struct session *session,int lossp) {
   if (!session||(lossp<0)||(lossp>=session->lossc)) return;
   struct loss *loss=session->lossv+lossp;
-  if (!loss->race) return;
+  if (!loss->race||!loss->mapid) return;
   session_add_customer(session,loss->race);
-  loss->race=0;
+  loss->mapid=0; // Prevents it being used again. Don't shuffle the list; loss sprites might have recorded their position in it.
 }
 
 /* Add tilesheet.

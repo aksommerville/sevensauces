@@ -29,6 +29,7 @@ struct sprite_hero {
   int animframe;
   uint8_t item_in_use;
   int fish_outcome; // We determine at the moment fishing begins, whether there will be a minigame or not.
+  double itemclock; // Resets to zero at start and end of usage; anything in between is up to the item's handler.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)

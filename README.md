@@ -4,8 +4,12 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [ ] Losses are reappearing incorrectly.
-- [ ] Shops sometimes showing an incorrect texture by item description, when empty slot focussed.
+- [x] Losses are reappearing incorrectly.
+- [x] Shops sometimes showing an incorrect texture by item description, when empty slot focussed.
+- - Seems to happen reliably on the second day, never on the first.
+- [x] It's infuriating when animals get cornered in a door, then the door warps me when I try to catch them.
+- - Can we make fauna not step on doors? Or change the door trigger to wait until you hit the other side, somehow?
+- - Or prevent fauna from entering the outermost cell of map? That might be the cheapest fix.
 - [x] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
 - [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
@@ -47,6 +51,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - Reveal the Daily Special.
 - - Tell composition of tonight's party.
 - - Recommend a recipe.
+- [ ] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
 
 ## Notes re starting over
 

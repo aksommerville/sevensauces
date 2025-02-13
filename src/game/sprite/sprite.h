@@ -96,9 +96,10 @@ void sprite_kill_soon(struct sprite *sprite);
  * Sprites that want collision resolution against the map should call this on their own, any time they've moved.
  * There is no provision for sprite-on-sprite collisions.
  * All sprites are circles with a radius of 0.5 m.
+ * (border_radius) is the minimum distance to world edges. Clamps low to 0.5.
  * Returns nonzero if the position changed.
  */
-int sprite_rectify_physics(struct sprite *sprite);
+int sprite_rectify_physics(struct sprite *sprite,double border_radius);
 
 /* Sprite type.
  *************************************************************/

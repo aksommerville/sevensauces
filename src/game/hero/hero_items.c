@@ -92,7 +92,7 @@ static void hero_end_grapple(struct sprite *sprite) {
   SPRITE->item_in_use=0;
   hero_rejoin_motion(sprite);
   //TODO If we ended up over water, should we drown? As is, we will pop out to a safe place.
-  sprite_rectify_physics(sprite); // We don't check physics while grappling.
+  sprite_rectify_physics(sprite,0.5); // We don't check physics while grappling.
 }
 
 static void hero_update_grapple(struct sprite *sprite,double elapsed) {
@@ -107,7 +107,7 @@ void sprite_hero_engage_grapple(struct sprite *sprite) {
 }
 
 void sprite_hero_release_grapple(struct sprite *sprite) {
-  sprite_rectify_physics(sprite); // We don't check physics while grappling.
+  sprite_rectify_physics(sprite,0.5); // We don't check physics while grappling.
 }
 
 /* Fishpole.
@@ -296,7 +296,8 @@ static void hero_end_letter(struct sprite *sprite) {
 }
 
 static void hero_update_letter(struct sprite *sprite,double elapsed,uint8_t itemid) {
-  //TODO
+  SPRITE->itemclock+=elapsed;
+  // Actuation is managed by the "loss" sprite.
 }
 
 /* Begin action.
@@ -304,6 +305,7 @@ static void hero_update_letter(struct sprite *sprite,double elapsed,uint8_t item
 
 void sprite_hero_action(struct sprite *sprite) {
   if (SPRITE->item_in_use) return;
+  SPRITE->itemclock=0.0;
   uint8_t itemid=g.session->inventory[g.session->invp];
   const struct item *item=itemv+itemid;
   switch (item->usage) {
@@ -328,6 +330,7 @@ void sprite_hero_action(struct sprite *sprite) {
  */
 
 void sprite_hero_end_action(struct sprite *sprite) {
+  SPRITE->itemclock=0.0;
   switch (SPRITE->item_in_use) {
     case NS_item_sword: hero_end_sword(sprite); break;
     case NS_item_grapple: hero_end_grapple(sprite); break;
@@ -355,6 +358,7 @@ int sprite_hero_is_apologizing(struct sprite *sprite,struct sprite *apologizee) 
   if (!sprite||(sprite->type!=&sprite_type_hero)) return 0;
   if (!apologizee) return 0;
   if (SPRITE->item_in_use!=NS_item_apology) return 0;
+  if (SPRITE->itemclock<0.250) return 0; // Let the card be shown for a little.
   double l=sprite->x-1.0+SPRITE->facedx;
   double r=sprite->x+1.0+SPRITE->facedx;
   if (apologizee->x<l) return 0;

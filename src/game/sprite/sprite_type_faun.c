@@ -276,7 +276,7 @@ static void faun_step(struct sprite *sprite,double elapsed) {
   double x0=sprite->x,y0=sprite->y;
   sprite->x+=SPRITE->dx*elapsed;
   sprite->y+=SPRITE->dy*elapsed;
-  sprite_rectify_physics(sprite);
+  sprite_rectify_physics(sprite,1.5);
   if (SPRITE->spooked) {
     double dx=sprite->x-x0,dy=sprite->y-y0;
     double d=sqrt(dx*dx+dy*dy);
