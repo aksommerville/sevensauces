@@ -4,6 +4,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
+- [ ] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
 - [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
 - [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [x] Sort sprites before render
@@ -37,7 +38,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
 - [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
 - [ ] EOD: Show money earned (and move that into stew).
-- [ ] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
+- [x] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
 - [ ] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
 - [ ] Door transitions
 - [ ] Assistance near home:

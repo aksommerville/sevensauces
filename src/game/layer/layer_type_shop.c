@@ -117,16 +117,13 @@ static void shop_build_sell(struct layer *layer) {
   const int colc=4;
   int i=0,col=0,row=0;
   for (;i<INVENTORY_SIZE;i++) {
-    if (g.session->inventory[i]) {
-      const struct item *item=itemv+g.session->inventory[i];
-      int price=shop_sell_price_for_item(layer,item);
-      int x=x0+xstride*col;
-      int y=y0+ystride*row;
-      struct widget *widget=widget_sale_spawn(LAYER->menu,x,y,item,price);
-      if (!widget) return;
-      widget->id=SHOP_ID_SELL_ITEM+i;
-    }
-    // Advance the position even if the slot is empty, so we mimic the pause and kitchen layouts.
+    const struct item *item=itemv+g.session->inventory[i];
+    int price=shop_sell_price_for_item(layer,item);
+    int x=x0+xstride*col;
+    int y=y0+ystride*row;
+    struct widget *widget=widget_sale_spawn(LAYER->menu,x,y,item,price);
+    if (!widget) return;
+    widget->id=SHOP_ID_SELL_ITEM+i;
     if (++col>=colc) {
       col=0;
       row++;
@@ -175,7 +172,7 @@ static void shop_sell(struct layer *layer,int wid) {
   if ((g.session->gold+=price)>999) g.session->gold=999;
   egg_play_sound(RID_sound_sell);
   g.session->inventory[invp]=0;
-  menu_delete_widget_id(LAYER->menu,wid);
+  widget_sale_blank(menu_widget_by_id(LAYER->menu,wid));
 }
 
 /* Menu callbacks.

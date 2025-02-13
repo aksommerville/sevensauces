@@ -60,19 +60,16 @@ struct widget *widget_sale_spawn(struct menu *menu,int x,int y,const struct item
     if (price>=100) tmp[tmpc++]='0'+(price/100)%10;
     if (price>= 10) tmp[tmpc++]='0'+(price/ 10)%10;
     tmp[tmpc++]='0'+price%10;
-  } else {
-    pricecolor=0xa0a0a0ff;
-    tmp[tmpc++]='-';
-    tmp[tmpc++]='-';
-    tmp[tmpc++]='-';
   }
   
-  if (!(WIDGET->price_texid=font_tex_oneline(g.font,tmp,tmpc,NS_sys_tilesize<<1,pricecolor))) {
-    menu_remove_widget(menu,widget);
-    widget_del(widget);
-    return 0;
+  if (tmpc) {
+    if (!(WIDGET->price_texid=font_tex_oneline(g.font,tmp,tmpc,NS_sys_tilesize<<1,pricecolor))) {
+      menu_remove_widget(menu,widget);
+      widget_del(widget);
+      return 0;
+    }
+    egg_texture_get_status(&WIDGET->price_w,&WIDGET->price_h,WIDGET->price_texid);
   }
-  egg_texture_get_status(&WIDGET->price_w,&WIDGET->price_h,WIDGET->price_texid);
   
   WIDGET->tx=widget->w>>1;
   WIDGET->px=(widget->w>>1)-(WIDGET->price_w>>1);
@@ -83,4 +80,11 @@ struct widget *widget_sale_spawn(struct menu *menu,int x,int y,const struct item
   WIDGET->py=totaly+NS_sys_tilesize+gap;
   
   return widget;
+}
+
+void widget_sale_blank(struct widget *widget) {
+  if (!widget||(widget->type!=&widget_type_sale)) return;
+  WIDGET->tileid=0;
+  WIDGET->price_w=0;
+  WIDGET->price_h=0;
 }

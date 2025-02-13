@@ -118,6 +118,7 @@ int widget_decal_setup_text(struct widget *widget,const char *src,int srcc,int w
 int widget_decal_setup_string(struct widget *widget,int rid,int ix,int wlimit,uint32_t rgba); // ''
 void widget_decal_align(struct widget *widget,uint16_t align); // Centered (0) by default. Provide dpad button ids to change.
 void widget_decal_blink(struct widget *widget,int repc); // For highlighting. <0 to blink forever, 0 to stop blinking, or >0 blink so many times
+void widget_sale_blank(struct widget *widget);
 
 struct widget *widget_blotter_spawn(struct menu *menu,int x,int y,int w,int h,uint32_t rgba,void (*cb)(struct widget *widget),void *userdata);
 struct widget *widget_tile_spawn(struct menu *menu,int x,int y,int imageid,uint8_t tileid,uint8_t xform,void (*cb)(struct widget *widget),void *userdata);

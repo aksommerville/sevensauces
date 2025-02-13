@@ -65,9 +65,11 @@ static void kitchen_cb_activate(struct menu *menu,struct widget *widget) {
     if (g.kitchen->selected[invp]) {
       egg_play_sound(RID_sound_unselect_ingredient);
       g.kitchen->selected[invp]=0;
-    } else {
+    } else if (g.session->inventory[invp]) {
       egg_play_sound(RID_sound_select_ingredient);
       g.kitchen->selected[invp]=1;
+    } else {
+      egg_play_sound(RID_sound_reject);
     }
   
   } else switch (widget->id) {
@@ -94,12 +96,10 @@ static int _kitchen_init(struct layer *layer) {
   struct widget *widget;
   
   /* Populate menu from inventory.
-   * The inventory can't change while we're open. Selecting an item just checkmarks it, doesn't actually remove from the pantry.
-   * Only create widgets for inventory slots actually occupied.
+   * Include the zeroes. It's disconcerting to have focus skip over them.
    */
   int invp=0; for (;invp<16;invp++) {
     uint8_t itemid=g.session->inventory[invp];
-    if (!itemid) continue;
     const struct item *item=itemv+itemid;
     int x=invp&3,y=invp>>2;
     x*=NS_sys_tilesize+2;

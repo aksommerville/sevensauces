@@ -44,15 +44,11 @@ struct world *world_new() {
  */
  
 static void world_generate_loss_sprites(struct world *world) {
-  fprintf(stderr,"%s mapid=%d lossc=%d\n",__func__,world->map->rid,g.session->lossc);
   int i=g.session->lossc;
   struct loss *loss=g.session->lossv+i-1;
   for (;i-->0;loss--) {
     if (loss->mapid!=world->map->rid) continue;
     struct sprite *sprite=sprite_new(&sprite_type_loss,world->sprites,loss->x+0.5,loss->y+0.5,loss->race|(i<<8),0);
-    if (sprite) {
-      fprintf(stderr,"Generated loss sprite at %d,%d\n",loss->x,loss->y);
-    }
   }
 }
 
