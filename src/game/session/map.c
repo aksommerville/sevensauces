@@ -72,6 +72,15 @@ static int map_load_poi(struct map *map) {
           poi->argc=cmd.argc;
         } break;
       case CMD_map_image: map->imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+      case CMD_map_trappable: {
+          if (map->trappablec>=MAP_TRAPPABLE_LIMIT) {
+            fprintf(stderr,"map:%d: Too many trappables. Limit %d.\n",map->rid,MAP_TRAPPABLE_LIMIT);
+            break;
+          }
+          struct trappable *t=map->trappablev+map->trappablec++;
+          t->itemid=cmd.argv[0];
+          t->odds=cmd.argv[1];
+        } break;
     }
   }
   return 0;

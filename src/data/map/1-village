@@ -59,3 +59,4 @@ door @0,26 map:5 @39,8 0x0000
 door @0,27 map:5 @39,9 0x0000
 door @9,14 map:14 @19,29 0x0000
 door @12,14 map:15 @19,29 0x0000
+trappable (u8:item)rat 10

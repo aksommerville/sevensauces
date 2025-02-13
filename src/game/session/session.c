@@ -307,31 +307,6 @@ struct plant *session_add_plant(struct session *session) {
   return plant;
 }
 
-static int session_get_map_imageid(const struct map *map) {
-  struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
-  struct rom_command cmd;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
-    if (cmd.opcode==CMD_map_image) return (cmd.argv[0]<<8)|cmd.argv[1];
-  }
-  return 0;
-}
-
-static void session_read_tilesheet(uint8_t *physics,uint8_t *tsitemid,int imageid) {
-  memset(physics,0,256);
-  memset(tsitemid,0,256);
-  const void *src=0;
-  int srcc=sauces_res_get(&src,EGG_TID_tilesheet,imageid);
-  struct rom_tilesheet_reader reader;
-  if (rom_tilesheet_reader_init(&reader,src,srcc)<0) return;
-  struct rom_tilesheet_entry entry;
-  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
-    switch (entry.tableid) {
-      case NS_tilesheet_physics: memcpy(physics+entry.tileid,entry.v,entry.c); break;
-      case NS_tilesheet_item: memcpy(tsitemid+entry.tileid,entry.v,entry.c); break;
-    }
-  }
-}
-
 static int session_get_item_tileid(const uint8_t *physics,const uint8_t *tsitemid,uint8_t itemid) {
   int tileid=0; for (;tileid<0x100;tileid++,physics++,tsitemid++) {
     if (*physics!=NS_physics_harvest) continue;
@@ -344,7 +319,6 @@ static int session_get_item_tileid(const uint8_t *physics,const uint8_t *tsitemi
 void session_apply_plants(struct session *session) {
   int mapid=0,imageid=0;
   struct map *map;
-  uint8_t physics[256],tsitemid[256];
   const struct plant *plant=session->plantv;
   int i=session->plantc;
   session->plantc=0;
@@ -353,28 +327,67 @@ void session_apply_plants(struct session *session) {
     
     // Avoid reacquiring map and tilesheet for each plant.
     // The odds are very strong, if there's more than one plant, that they're all on the same map.
-    // And even across maps, they might use the same image ie tilesheet. Loading tilesheets is expensive.
     if (plant->mapid!=mapid) {
       mapid=plant->mapid;
       map=session_get_map(session,mapid);
     }
     if (!map) continue;
     if ((plant->x<0)||(plant->y<0)||(plant->x>=map->w)||(plant->y>=map->h)) continue;
-    int nimageid=session_get_map_imageid(map);
-    if (nimageid!=imageid) {
-      imageid=nimageid;
-      session_read_tilesheet(physics,tsitemid,imageid);
-    }
     
     int cellp=plant->y*map->w+plant->x;
     uint8_t tileid=map->v[cellp];
-    if (physics[tileid]!=NS_physics_seed) continue;
-    int ntileid=session_get_item_tileid(physics,tsitemid,plant->itemid);
+    if (map->physics[tileid]!=NS_physics_seed) continue;
+    int ntileid=session_get_item_tileid(map->physics,map->itemid,plant->itemid);
     if (ntileid<0) {
       fprintf(stderr,"tilesheet:%d has no plant tile for item 0x%02x\n",imageid,plant->itemid);
       continue;
     }
     map->v[cellp]=ntileid;
+  }
+}
+
+/* Populate traps.
+ */
+ 
+static void session_populate_trap(uint8_t *dst,struct session *session,struct map *map) {
+  if (map->trappablec<1) {
+    fprintf(stderr,"Trap was placed on map:%d but it has no trappables. Leaving unpopulated.\n",map->rid);
+    return;
+  }
+  int range=1,i=map->trappablec;
+  const struct trappable *t=map->trappablev;
+  for (;i-->0;t++) range+=t->odds;
+  int choice=rand()%range;
+  uint8_t itemid=map->trappablev[0].itemid;
+  for (t=map->trappablev,i=map->trappablec;i-->0;t++) {
+    choice-=t->odds;
+    if (choice<=0) {
+      itemid=t->itemid;
+      break;
+    }
+  }
+  int tileid=0x100;
+  while (tileid-->0) {
+    if (map->itemid[tileid]!=itemid) continue;
+    if (map->physics[tileid]!=NS_physics_harvest) continue;
+    *dst=tileid;
+    return;
+  }
+  fprintf(stderr,"Selected item %d for trap on map:%d but there isn't a harvest tile for it.\n",itemid,map->rid);
+}
+ 
+void session_populate_traps(struct session *session) {
+  // We're going to examine every cell of every map looking for traps... TODO Consider making a list of them as they get placed.
+  struct map *map=session->mapv;
+  int i=session->mapc;
+  for (;i-->0;map++) {
+    uint8_t *v=map->v;
+    int celli=map->w*map->h;
+    for (;celli-->0;v++) {
+      if (map->physics[*v]==NS_physics_trap) {
+        session_populate_trap(v,session,map);
+      }
+    }
   }
 }
 

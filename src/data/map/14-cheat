@@ -77,3 +77,4 @@ sprite @14,25 sprite:item (u8:item)royaljelly 0x000000
 sprite @16,25 sprite:item (u8:item)flashsauce 0x000000
 sprite @18,25 sprite:item (u8:item)heavysauce 0x000000
 sprite @20,25 sprite:item (u8:item)fragilesauce 0x000000
+trappable (u8:item)cow 10

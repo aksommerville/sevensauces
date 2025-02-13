@@ -12,6 +12,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [x] Earn money each day, say $1/customer?
 - [ ] Transient entities: Vegetables, animals, stones...
 - [x] Shops: Add a stationer, in addition to the ones from 20241217
+- [ ] Talking NPCs.
 - [ ] Condensery
 - [ ] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
 - [ ] Kitchen: Advice.

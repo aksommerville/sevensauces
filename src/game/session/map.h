@@ -7,6 +7,8 @@
 #ifndef MAP_H
 #define MAP_H
 
+#define MAP_TRAPPABLE_LIMIT 8
+
 struct map {
   int rid;
   int w,h;
@@ -28,6 +30,12 @@ struct map {
     int argc;
   } *poiv;
   int poic,poia;
+  
+  struct trappable {
+    uint8_t itemid;
+    uint8_t odds;
+  } trappablev[MAP_TRAPPABLE_LIMIT];
+  int trappablec;
 };
 
 void map_cleanup(struct map *map);

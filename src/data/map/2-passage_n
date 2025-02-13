@@ -47,3 +47,6 @@ door @0,5 map:6 @39,5 0x0000
 door @0,6 map:6 @39,6 0x0000
 door @19,4 map:7 @0,4 0x0000
 door @19,5 map:7 @0,5 0x0000
+trappable (u8:item)rabbit 10
+trappable (u8:item)quail 10
+trappable (u8:item)deer 5

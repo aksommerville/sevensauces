@@ -42,3 +42,7 @@
 image image:3
 door @5,39 map:passage_w @5,0 0x0000
 door @6,39 map:passage_w @6,0 0x0000
+trappable (u8:item)rat 10
+trappable (u8:item)rabbit 10
+trappable (u8:item)quail 4
+trappable (u8:item)deer 2
