@@ -62,6 +62,7 @@ static int map_load_poi(struct map *map) {
       case CMD_map_condensery:
       case CMD_map_shop:
       case CMD_map_door:
+      case CMD_map_dialogue:
         {
           int p=map_poiv_search(map,cmd.argv[0],cmd.argv[1]);
           if (p<0) p=-p-1;

@@ -33,11 +33,12 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [x] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
 - - I think we don't need this -- the world is very small.
 - [ ] Door transitions
-- [ ] Assistance near home:
+- [x] Assistance near home:
 - - Reveal the Daily Special.
 - - Tell composition of tonight's party.
 - - Recommend a recipe.
 - [x] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
+- [ ] Eliminate the bespoke string formatting, replace with `strings_format()`
 
 ## Notes re starting over
 

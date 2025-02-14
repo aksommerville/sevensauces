@@ -135,6 +135,7 @@ static void _kitchen_input(struct layer *layer,int input,int pvinput) {
 static void _kitchen_update(struct layer *layer,double elapsed) {
 
   g.kitchen->clock+=elapsed;
+  g.session->kitchentime+=elapsed;
 
   menu_update(LAYER->menu,elapsed);
   

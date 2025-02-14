@@ -18,6 +18,8 @@ struct session {
   uint8_t inventory[INVENTORY_SIZE]; // itemid
   uint8_t invp; // 0..15, which slot is selected
   uint16_t gold; // 0..999
+  double worldtime,kitchentime;
+  uint8_t nonce; // Random number for arbitrary things that need to hold constant for the session (eg recipe recommendations).
   
   struct map mapv[SESSION_MAP_LIMIT];
   int mapc;

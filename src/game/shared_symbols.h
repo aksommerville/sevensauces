@@ -16,6 +16,7 @@
 #define CMD_map_condensery 0x23 /* u16:pos */
 #define CMD_map_trappable  0x24 /* u8:itemid u8:odds. Odds are purely relative. */
 #define CMD_map_shop       0x40 /* u16:pos u16:shopid */
+#define CMD_map_dialogue   0x41 /* u16:pos u16:NS_dialogue_* */
 #define CMD_map_neighbors  0x60 /* u16:left u16:right u16:up u16:down */
 #define CMD_map_sprite     0x61 /* u16:pos u16:spriteid u32:reserved */
 #define CMD_map_door       0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
@@ -150,5 +151,11 @@
 #define NS_item_heavysauce     0x85
 #define NS_item_fragilesauce   0x86
 #define NS_item_forbidden      0x87
+
+/* For CMD_map_dialogue, the action is one of these enums, all hard-coded.
+ */
+#define NS_dialogue_dailyspecial     1
+#define NS_dialogue_party            2
+#define NS_dialogue_recipe           3
 
 #endif

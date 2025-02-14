@@ -134,6 +134,7 @@ int world_load_map(struct world *world,int mapid) {
  
 void world_update(struct world *world,double elapsed) {
   if ((world->clock-=elapsed)<=0.0) return;
+  g.session->worldtime+=elapsed;
   sprites_update(world->sprites,elapsed);
 }
 

@@ -48,6 +48,8 @@ void sauces_end_session();
 int sauces_end_day();
 int sauces_end_night();
 
+void sauces_dialogue(int dialogueid);
+
 int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid);
 
 /* Generate the long text description for pause menu and kitchen, optionally with color.
@@ -56,5 +58,9 @@ int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t 
 int sauces_generate_item_description(char *dst,int dsta,uint8_t itemid,uint8_t flags);
 #define ITEM_DESC_COLOR 0x01 /* We may start lines with 0x7f followed by '0'..'9' to indicate color. Only immediately after an LF. */
 extern const uint32_t sauces_item_description_colorv[10];
+
+/* Generate a recipe in the global language, based on session's customers and inventory.
+ */
+int sauces_generate_recipe(char *dst,int dsta);
 
 #endif

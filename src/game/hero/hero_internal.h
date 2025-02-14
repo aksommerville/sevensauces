@@ -23,6 +23,7 @@ struct sprite_hero {
   double cursorclock;
   int cursorframe;
   int mapid,col,row; // Track cell for quantized actions like harvest.
+  int pressx,pressy; // Similar to (col,row), but an impassable cell that we're actively bumping. If present, implies motion is in progress.
   struct sprite *touchv[HERO_TOUCH_LIMIT]; // WEAK and possibly invalid. Confirm residency before dereferencing.
   int touchc;
   double animclock;
@@ -38,6 +39,8 @@ struct sprite_hero {
 void hero_check_touches(struct sprite *sprite);
 void hero_check_cell(struct sprite *sprite);
 void hero_get_item_cell(int *col,int *row,struct sprite *sprite);
+void hero_check_press(struct sprite *sprite); // One of (check_press,no_press) should be called every update.
+void hero_no_press(struct sprite *sprite);
 
 // hero_motion.c
 void hero_reset_animclock(struct sprite *sprite);

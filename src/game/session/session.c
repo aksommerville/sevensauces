@@ -153,6 +153,7 @@ static struct tilesheet *session_get_tilesheet(struct session *session,int rid) 
  */
  
 static int session_init(struct session *session) {
+  session->nonce=rand();
 
   /* Gather resources.
    */

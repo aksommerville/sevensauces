@@ -14,6 +14,7 @@ static int _hero_init(struct sprite *sprite) {
   sprite->imageid=RID_image_sprites1;
   sprite->tileid=0x00;
   SPRITE->facedy=1;
+  SPRITE->pressx=SPRITE->pressy=-1;
   return 0;
 }
 
@@ -43,8 +44,9 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     const double walkspeed=6.0; // m/s
     sprite->x+=walkspeed*elapsed*SPRITE->walkdx;
     sprite->y+=walkspeed*elapsed*SPRITE->walkdy;
-    sprite_rectify_physics(sprite,0.5);
-  }
+    if (sprite_rectify_physics(sprite,0.5)) hero_check_press(sprite);
+    else hero_no_press(sprite);
+  } else hero_no_press(sprite);
   
   hero_update_item(sprite,elapsed);
   if (SPRITE->item_in_use==NS_item_grapple) {

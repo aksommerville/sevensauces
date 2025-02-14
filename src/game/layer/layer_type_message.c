@@ -45,7 +45,7 @@ const struct layer_type layer_type_message={
 int layer_message_setup_raw(struct layer *layer,const char *src,int srcc) {
   if (!layer||(layer->type!=&layer_type_message)) return -1;
   if (LAYER->texid) return -1;
-  LAYER->texid=font_tex_multiline(g.font,src,srcc,FBW>>1,FBH,0xffffffff);
+  LAYER->texid=font_tex_multiline(g.font,src,srcc,(FBW*3)>>2,FBH,0xffffffff);
   egg_texture_get_status(&LAYER->texw,&LAYER->texh,LAYER->texid);
   return 0;
 }

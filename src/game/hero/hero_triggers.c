@@ -172,8 +172,54 @@ void hero_check_cell(struct sprite *sprite) {
       case CMD_map_shop: hero_enter_shop(sprite,(poi->argv[2]<<8)|poi->argv[3]); return;
       case CMD_map_condensery: hero_enter_condensery(sprite); return;
       case CMD_map_door: hero_enter_door(sprite,(poi->argv[2]<<8)|poi->argv[3],poi->argv[4],poi->argv[5]); return;
+      case CMD_map_dialogue: sauces_dialogue((poi->argv[2]<<8)|poi->argv[3]); return;
     
     }
+  }
+}
+
+/* Pressure triggers, actuation.
+ */
+ 
+static void hero_press_triggers(struct sprite *sprite,int x,int y) {
+  struct poi *poi;
+  int i=map_get_poi(&poi,g.world->map,x,y);
+  for (;i-->0;poi++) {
+    switch (poi->opcode) {
+      case CMD_map_dialogue: sauces_dialogue((poi->argv[2]<<8)|poi->argv[3]); return;
+    }
+  }
+}
+
+/* Pressure triggers (ie impassable cells).
+ * High-frequency public entry points.
+ */
+ 
+void hero_check_press(struct sprite *sprite) {
+  int x=(int)(sprite->x+SPRITE->facedx);
+  int y=(int)(sprite->y+SPRITE->facedy);
+  if ((x>=0)&&(y>=0)&&(x<g.world->map->w)&&(y<g.world->map->h)) {
+    uint8_t tileid=g.world->map->v[y*g.world->map->w+x];
+    uint8_t physics=g.world->map->physics[tileid];
+    if ((1<<physics)&sprite->solidmask) {
+      // OK (x,y) is correct.
+    } else {
+      x=y=-1;
+    }
+  } else {
+    x=y=-1;
+  }
+  if ((x!=SPRITE->pressx)||(y!=SPRITE->pressy)) {
+    SPRITE->pressx=x;
+    SPRITE->pressy=y;
+    hero_press_triggers(sprite,x,y);
+  }
+}
+
+void hero_no_press(struct sprite *sprite) {
+  if (SPRITE->pressx>=0) {
+    //TODO Any need for release notification from pressure? If so, also patch them in at changes in hero_check_press.
+    SPRITE->pressx=SPRITE->pressy=-1;
   }
 }
 
