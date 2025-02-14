@@ -241,6 +241,7 @@ static const struct item *choose_item(const struct item **v,int c,int density) {
 static const struct item *choose_something_else(const struct item **v,int c,const struct item *not) {
   int candidatec=0,i;
   for (i=c;i-->0;) {
+    if (v[i]==not) continue;
     if (v[i]->density!=not->density) continue;
     if (v[i]->foodgroup!=not->foodgroup) continue;
     candidatec++;
@@ -248,6 +249,7 @@ static const struct item *choose_something_else(const struct item **v,int c,cons
   if (!candidatec) return not;
   int choice=(g.session->nonce+g.session->day+g.session->customerc)%candidatec;
   for (i=c;i-->0;) {
+    if (v[i]==not) continue;
     if (v[i]->density!=not->density) continue;
     if (v[i]->foodgroup!=not->foodgroup) continue;
     if (!choice--) return v[i];
