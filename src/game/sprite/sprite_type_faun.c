@@ -291,16 +291,25 @@ static void faun_step(struct sprite *sprite,double elapsed) {
  */
  
 static void faun_check_arrows(struct sprite *sprite) {
-  double l=sprite->x-0.5,r=sprite->x+0.5,t=sprite->y-0.5,b=sprite->y+0.5;
+  const double radius=0.5,wide=0.25;
+  double l=sprite->x-radius,r=sprite->x+radius,t=sprite->y-radius,b=sprite->y+radius;
+  double wl=l-wide,wr=r+wide,wt=t-wide,wb=b+wide;
   struct sprite **v;
   int c=sprites_get_all(&v,sprite->owner);
   for (;c-->0;v++) {
     struct sprite *other=*v;
     if (other->type!=&sprite_type_arrow) continue;
-    if (other->x<l) continue;
-    if (other->x>r) continue;
-    if (other->y<t) continue;
-    if (other->y>b) continue;
+    if (other->arg&4) { // Stone: Smaller (natural) hit box.
+      if (other->x<l) continue;
+      if (other->x>r) continue;
+      if (other->y<t) continue;
+      if (other->y>b) continue;
+    } else { // Arrow:  Wider hit box.
+      if (other->x<wl) continue;
+      if (other->x>wr) continue;
+      if (other->y<wt) continue;
+      if (other->y>wb) continue;
+    }
     sprite_kill_soon(other);
     //TODO stunned tile
     if (SPRITE->stun_clock<=0.0) {

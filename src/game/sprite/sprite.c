@@ -116,6 +116,8 @@ struct sprite *sprite_new(
   sprite->cmdc=rspr.cmdc;
   owner->v[owner->c++]=sprite;
   if (!owner->hero&&(type==&sprite_type_hero)) owner->hero=sprite;
+  sprite->radius=0.5;
+  sprite->solidmask=(1<<NS_physics_solid)|(1<<NS_physics_water)|(1<<NS_physics_grapplable);
   
   /* Read the resource for generic initialization.
    * It's fine if it's empty.

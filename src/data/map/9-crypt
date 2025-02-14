@@ -47,3 +47,4 @@ trappable (u8:item)rabbit 10
 trappable (u8:item)quail 10
 trappable (u8:item)deer 5
 forage
+sprite @35,5 sprite:item (u8:item)flashsauce 0x000000

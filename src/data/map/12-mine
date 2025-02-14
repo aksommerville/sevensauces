@@ -45,3 +45,4 @@ door @2,0 map:passage_w @2,19 0x0000
 trappable (u8:item)rabbit 10
 trappable (u8:item)rat 10
 forage
+sprite @7,8 sprite:item (u8:item)fragilesauce 0x000000

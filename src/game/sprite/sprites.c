@@ -243,6 +243,16 @@ void sprites_render(struct sprites *sprites) {
       }
       graf_draw_tile(&g.graf,texid,x,y,sprite->tileid,sprite->xform);
     }
+    
+    if (0&&(sprite->type==&sprite_type_arrow)) {//XXX highlight hitboxes
+      int x=(int)(sprite->x*NS_sys_tilesize)-g.world->viewx;
+      int y=(int)(sprite->y*NS_sys_tilesize)-g.world->viewy;
+      int w=(int)(sprite->radius*2.0*NS_sys_tilesize);
+      int h=(int)(sprite->radius*2.0*NS_sys_tilesize);
+      x-=w>>1;
+      y-=h>>1;
+      graf_draw_rect(&g.graf,x,y,w,h,0xff000080);
+    }
   }
 }
 

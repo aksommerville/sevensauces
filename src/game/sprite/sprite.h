@@ -69,6 +69,8 @@ struct sprite {
   uint8_t tileid,xform; // For generic render.
   int grapplable;
   int layer;
+  double radius; // For physics. Default 0.5.
+  uint8_t solidmask; // Bits, (1<<NS_physics_*), for physics.
 };
 
 /* Deletes the sprite immediately and unlists from its owner.

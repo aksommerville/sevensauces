@@ -48,3 +48,4 @@ trappable (u8:item)rat 10
 trappable (u8:item)quail 2
 trappable (u8:item)deer 1
 forage
+sprite @23,16 sprite:item (u8:item)forbidden 0x000000

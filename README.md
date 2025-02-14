@@ -4,21 +4,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [x] Losses are reappearing incorrectly.
-- [x] Shops sometimes showing an incorrect texture by item description, when empty slot focussed.
-- - Seems to happen reliably on the second day, never on the first.
-- [x] It's infuriating when animals get cornered in a door, then the door warps me when I try to catch them.
-- - Can we make fauna not step on doors? Or change the door trigger to wait until you hit the other side, somehow?
-- - Or prevent fauna from entering the outermost cell of map? That might be the cheapest fix.
-- [x] Stepping into the cheat room, the first couple items you touch don't trigger. Feels like timing, is there a blackout period?
-- [x] !!! Getting texture faults pretty reliably at the first evening. Implement recording in Egg first to help diagnose. Probably need to rewrite graf/texcache.
-- [ ] Arrow should stop at solid tiles and disappear into water -- both very important for stone
-- [x] Sort sprites before render
-- [x] Doors
-- [x] Money
-- [x] Earn money each day, say $1/customer?
-- [x] Transient entities: Vegetables, animals, stones...
-- [x] Shops: Add a stationer, in addition to the ones from 20241217
+- [x] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Talking NPCs.
 - [ ] Condensery
 - [ ] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
@@ -44,14 +30,14 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
 - [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
 - [ ] EOD: Show money earned (and move that into stew).
-- [x] Kitchen and shop: Create widgets for empty inventory slots. It's disconcerting when you have a lot of gaps.
-- [ ] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
+- [x] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
+- - I think we don't need this -- the world is very small.
 - [ ] Door transitions
 - [ ] Assistance near home:
 - - Reveal the Daily Special.
 - - Tell composition of tonight's party.
 - - Recommend a recipe.
-- [ ] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
+- [x] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
 
 ## Notes re starting over
 
