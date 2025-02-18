@@ -4,23 +4,25 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 ## TODO
 
-- [x] Arrow should stop at solid tiles and disappear into water -- both very important for stone
 - [ ] Talking NPCs.
 - [ ] Condensery
-- [ ] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
+- [x] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
 - [ ] Kitchen: Advice.
 - [ ] Kitchen: Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
+- [x] Kitchen: Make hourglass blink when there's a second or two remaining.
 - [ ] Should we give Dot some of her Full Moon toys too?
-- - YES: Broom, Umbrella, Bell
-- - NO: Chalk, Violin, Hat, Feather, Pitcher
+- - [ ] Broom. Would be for fast travel (not much need) or an alternative way to cross water. Need to ensure watery world edges behave sane.
+- - [ ] Wand: Shoots a beam that transforms any faun or item it touches. We can make a large set of items only reachable this way.
+- - [ ] Bell. Because there should always be a bell. Dot likes bells.
+- - [ ] Umbrella. Same idea as Full Moon, it's a shield. Could be useful in combat, once we have combat.
+- - [ ] Snowglobe?
+- - [ ] Compass? I'm not sure there's any point.
+- - NO: Chalk, Violin, Hat, Feather, Pitcher, Matches
 - - ALREADY DONE: Shovel, Seeds, Cheese, Gold
-- - MAYBE: Wand, Snowglobe, Matches, Compass.
-- - - Wand wouldn't be for casting spells; it would just be a weapon.
-- - - Matches probably not, since we don't (and won't) have item quantities.
-- - - Compass probably not, there's no buried treasure and no place for narrative guidance.
 - [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
 - [ ] Release grapple over water. What should happen? What we have is not ok.
 - [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
+- - It would be cool if you can catch a sea monster. Like, a giant squid that takes up half the screen.
 - [ ] Fishing challenges:
 - - [ ] Parachute
 - - [ ] Machine gun
@@ -39,6 +41,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - Recommend a recipe.
 - [x] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
 - [ ] Eliminate the bespoke string formatting, replace with `strings_format()`
+- [ ] Make an abbreviated option, say 3 days? 20-25 minutes/session will be a bit much for cons.
 
 ## Notes re starting over
 
@@ -168,4 +171,13 @@ This sounds good. Do it.
 2025-02-10: Apportioned the 8 challenge zones.
 With them all completely empty, I'm just barely able to reach every far corner in a single day.
 Once there's some actual challenge involved, this should be good.
-Two challenges per day should be possible, and 3 or 4 if you push it.
+Two challenges per day must be possible, and 3 or 4 if you push it.
+
+-----------------------------------------
+
+Optimal speed strategy -- keep this possible:
+- Buy ten rats.
+- Cook enough rats to reach the first werewolf.
+- Each day, if you have more customers than rats, buy more rats. Should need to replenish around Friday.
+
+I'm able to complete the week in about 30 seconds IGC this way.

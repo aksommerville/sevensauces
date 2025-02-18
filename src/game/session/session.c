@@ -194,6 +194,25 @@ static int session_init(struct session *session) {
   
   session->gold=10;
   
+  /*XXX Start with the works. */
+  session->inventory[ 0]=NS_item_shovel;
+  session->inventory[ 1]=NS_item_bow;
+  session->inventory[ 2]=NS_item_grapple;
+  session->inventory[ 3]=NS_item_fishpole;
+  session->inventory[ 4]=NS_item_goat;
+  session->inventory[ 5]=NS_item_cow;
+  session->inventory[ 6]=NS_item_rabbit;
+  session->inventory[ 7]=NS_item_rat;
+  session->inventory[ 8]=NS_item_carrot;
+  session->inventory[ 9]=NS_item_pumpkin;
+  session->inventory[10]=NS_item_bread;
+  session->inventory[11]=NS_item_brightsauce;
+  session->inventory[12]=NS_item_peppermint;
+  session->inventory[13]=NS_item_buckeye;
+  session->inventory[14]=NS_item_applepie;
+  session->inventory[15]=NS_item_arsenic;
+  /**/
+  
   return 0;
 }
 

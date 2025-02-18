@@ -10,6 +10,8 @@
 #define HGH 32
 #define HG_SRCX 138 /* The overlay shell, in image:kitchen_bits */
 #define HG_SRCY 1
+#define HG_SRCX_WARNING 188
+#define HG_SRCX_KAPUT 213
 #define HG_CTLX 163 /* Control image that shows us the sand color and available flow space. */
 #define HG_CTLY 1
 
@@ -186,28 +188,18 @@ static void hg_advance(struct hourglass *hg,double t) {
 /* Update/render.
  */
  
-void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t) {
+void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t,double remaining) {
   if (!hg) return;
   if ((hg->clock<t)&&(hg->clock<1.0)) {
     hg_advance(hg,t);
     egg_texture_load_raw(hg->texid,HGW,HGH,HGW<<2,hg->bits,HGW*HGH*4);
   }
   graf_draw_decal(&g.graf,hg->texid,dstx,dsty,0,0,HGW,HGH,0);
-  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_kitchen_bits),dstx,dsty,HG_SRCX,HG_SRCY,HGW,HGH,0);
-}
-
-/* Clock.XXX
- */
- 
-static void kitchen_render_clock(int x,int y,int w,int h,double p,double c) {
-  if (p>=c) { // Expired.
-    graf_draw_rect(&g.graf,x,y,w,h,0x808080ff);
-  } else {
-    graf_draw_rect(&g.graf,x,y,w,h,0x402000ff);
-    int fullh=(int)((h*p)/c);
-    if (fullh>0) {
-      if (fullh>h) fullh=h;
-      graf_draw_rect(&g.graf,x,y+h-fullh,w,fullh,0xff0000ff);
-    }
+  int srcx=HG_SRCX;
+  if (remaining<0.0) {
+    srcx=HG_SRCX_KAPUT;
+  } else if (remaining<5.0) {
+    if (((int)(remaining*4.0))&1) srcx=HG_SRCX_WARNING;
   }
+  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_kitchen_bits),dstx,dsty,srcx,HG_SRCY,HGW,HGH,0);
 }

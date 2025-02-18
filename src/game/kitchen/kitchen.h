@@ -69,9 +69,22 @@ void kitchen_commit_stew(const struct stew *stew);
 
 double clock_limit_by_day(int day);
 
+/* Hourglass is the clock visible in the upper left corner.
+ * It's strictly a view, it does not perform the actual timekeeping.
+ * (t) in 0..1, or >1 if finished.
+ * (remaining) counts down in absolute seconds, and negative if finished.
+ */
 struct hourglass;
 struct hourglass *hourglass_new();
 void hourglass_del(struct hourglass *hg);
-void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t);
+void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t,double remaining);
+
+/* Bobbler is a view of the cauldron, with your ingredients floating around in it.
+ * This doesn't convey any new information (the pantry says everything), but it's a big part of the pizzazz.
+ */
+struct bobbler;
+void bobbler_del(struct bobbler *bobbler);
+struct bobbler *bobbler_new();
+void bobbler_render(int dstx,int dsty,struct bobbler *bobbler);
 
 #endif

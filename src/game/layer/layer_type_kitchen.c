@@ -20,6 +20,7 @@ struct layer_kitchen {
   int details_dirty; // Rebuilds texture at the last moment.
   struct widget *focus; // WEAK, tracks menu focus so we know when details are dirty.
   struct hourglass *hourglass;
+  struct bobbler *bobbler;
 };
 
 #define LAYER ((struct layer_kitchen*)layer)
@@ -31,6 +32,7 @@ static void _kitchen_del(struct layer *layer) {
   menu_del(LAYER->menu);
   if (LAYER->details_texid) egg_texture_del(LAYER->details_texid);
   hourglass_del(LAYER->hourglass);
+  bobbler_del(LAYER->bobbler);
 }
 
 /* Ready.
@@ -89,6 +91,7 @@ static int _kitchen_init(struct layer *layer) {
   if (!g.kitchen||!g.session) return -1;
   layer->opaque=1;
   if (!(LAYER->hourglass=hourglass_new())) return -1;
+  if (!(LAYER->bobbler=bobbler_new())) return -1;
   if (!(LAYER->menu=menu_new())) return -1;
   LAYER->menu->userdata=layer;
   LAYER->menu->cb_activate=kitchen_cb_activate;
@@ -344,7 +347,7 @@ static void _kitchen_render(struct layer *layer) {
   
   /* Bubbles and bobbing items floating in the stew.
    */
-  //TODO
+  bobbler_render(4,49,LAYER->bobbler);
   
   /* Highlighted item details, right side.
    */
@@ -364,7 +367,7 @@ static void _kitchen_render(struct layer *layer) {
   
   /* Clock in the top left corner.
    */
-  hourglass_render(1,1,LAYER->hourglass,g.kitchen->clock/g.kitchen->clock_limit);
+  hourglass_render(1,1,LAYER->hourglass,g.kitchen->clock/g.kitchen->clock_limit,g.kitchen->clock_limit-g.kitchen->clock);
   
   /* Word bubble, if Little Sister is talking.
    */
