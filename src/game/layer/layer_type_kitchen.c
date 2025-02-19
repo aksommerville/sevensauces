@@ -12,6 +12,8 @@
 #define KITCHEN_ID_READY 16
 #define KITCHEN_ID_ADVICE 17
 
+#define ADVICE_FADE_TIME 0.500
+
 struct layer_kitchen {
   struct layer hdr;
   struct menu *menu;
@@ -57,9 +59,8 @@ static void kitchen_on_ready(struct layer *layer) {
  */
  
 static void kitchen_on_advice(struct layer *layer) {
-  fprintf(stderr,"%s\n",__func__);//TODO
   if (LAYER->lilsis) {
-    if (LAYER->advice_clock>1.0) LAYER->advice_clock=1.0;
+    if (LAYER->advice_clock>ADVICE_FADE_TIME) LAYER->advice_clock=ADVICE_FADE_TIME;
     return;
   }
   int strix=kitchen_assess(&LAYER->lilsis,g.kitchen);
@@ -88,6 +89,11 @@ static void kitchen_cb_activate(struct menu *menu,struct widget *widget) {
     } else if (g.session->inventory[invp]) {
       egg_play_sound(RID_sound_select_ingredient);
       g.kitchen->selected[invp]=1;
+      const struct item *item=itemv+g.session->inventory[invp];
+      if (item->foodgroup==NS_foodgroup_poison) {
+        LAYER->lilsis=0; // Interrupt any existing advice.
+        kitchen_on_advice(layer);
+      }
     } else {
       egg_play_sound(RID_sound_reject);
     }
@@ -398,8 +404,8 @@ static void _kitchen_render(struct layer *layer) {
   /* Word bubble, if Little Sister is talking.
    */
   if (LAYER->lilsis) {
-    if (LAYER->advice_clock<1.0) {
-      int alpha=(int)(LAYER->advice_clock*255.0);
+    if (LAYER->advice_clock<ADVICE_FADE_TIME) {
+      int alpha=(int)((LAYER->advice_clock*255.0)/ADVICE_FADE_TIME);
       graf_set_alpha(&g.graf,alpha);
     }
     graf_draw_decal(&g.graf,texid,37,4,1,1,114,31,0);

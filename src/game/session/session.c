@@ -194,7 +194,7 @@ static int session_init(struct session *session) {
   
   session->gold=10;
   
-  /*XXX Start with the works. */
+  /*XXX Start with the works. *
   session->inventory[ 0]=NS_item_shovel;
   session->inventory[ 1]=NS_item_bow;
   session->inventory[ 2]=NS_item_grapple;

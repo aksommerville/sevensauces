@@ -374,6 +374,9 @@ int kitchen_assess(int *severity,const struct kitchen *kitchen) {
   *severity=3; // "advise", the usual case.
   if (!kitchen) return 0;
   
+  /* First some simple rules: poison, inert, insufficient helpings.
+   * Gather the count by food group.
+   */
   int vegc=0,meatc=0,candyc=0,saucec=0,poisonc=0,inertc=0,helpingc=0;
   int invp=INVENTORY_SIZE;
   while (invp-->0) {
@@ -400,6 +403,10 @@ int kitchen_assess(int *severity,const struct kitchen *kitchen) {
   if (!helpingc) return 60;
   if (helpingc<g.session->customerc) return 63;
   
+  /* Next, we'll need customer counts by race.
+   * If a race is present but its favorite food is missing, talk about that.
+   * Note that there is not a favorite-food rule for man: His rule here is about the timer.
+   */
   int manc=0,rabbitc=0,octopusc=0,werewolfc=0;
   int i=g.session->customerc;
   const struct customer *customer=g.session->customerv;
@@ -412,7 +419,14 @@ int kitchen_assess(int *severity,const struct kitchen *kitchen) {
       case NS_race_princess: manc++; break;
     }
   }
-  // The majority race rule is not exclusive, ties can break for either party -- that's important.
+  if (werewolfc&&!meatc) return 69;
+  if (rabbitc&&!vegc) return 70;
+  if (octopusc&&!candyc) return 71;
+  
+  /* Finally check the majority-race rule.
+   * It can be satisfied multiple ways, if the population is tied (which is common).
+   * Any of those is satisfied, call the stew ok.
+   */
   int man=(manc>=rabbitc)&&(manc>=octopusc)&&(manc>=werewolfc);
   int rabbit=(rabbitc>=manc)&&(rabbitc>=octopusc)&&(rabbitc>=werewolfc);
   int octopus=(octopusc>=manc)&&(octopusc>=rabbitc)&&(octopusc>=werewolfc);
@@ -425,6 +439,5 @@ int kitchen_assess(int *severity,const struct kitchen *kitchen) {
   if (rabbit) return 66;
   if (octopus) return 67;
   if (man) return 68;
-  
   return 0;
 }
