@@ -364,3 +364,67 @@ void kitchen_commit_stew(const struct stew *stew) {
   
   //TODO We probably want more session-level bookkeeping, for achievements or just reporting.
 }
+
+/* Generate advice.
+ * We check for poison and check food groups against the majority-race rule.
+ * We do not check the daily specials.
+ */
+ 
+int kitchen_assess(int *severity,const struct kitchen *kitchen) {
+  *severity=3; // "advise", the usual case.
+  if (!kitchen) return 0;
+  
+  int vegc=0,meatc=0,candyc=0,saucec=0,poisonc=0,inertc=0,helpingc=0;
+  int invp=INVENTORY_SIZE;
+  while (invp-->0) {
+    if (!kitchen->selected[invp]) continue;
+    const struct item *item=itemv+g.session->inventory[invp];
+    switch (item->foodgroup) {
+      case NS_foodgroup_veg: vegc++; break;
+      case NS_foodgroup_meat: meatc++; break;
+      case NS_foodgroup_candy: candyc++; break;
+      case NS_foodgroup_sauce: saucec++; break;
+      case NS_foodgroup_poison: poisonc++; break;
+      default: inertc++;
+    }
+    helpingc+=item->density;
+  }
+  if (poisonc) {
+    *severity=1;
+    return 61;
+  }
+  if (inertc) {
+    *severity=1;
+    return 62;
+  }
+  if (!helpingc) return 60;
+  if (helpingc<g.session->customerc) return 63;
+  
+  int manc=0,rabbitc=0,octopusc=0,werewolfc=0;
+  int i=g.session->customerc;
+  const struct customer *customer=g.session->customerv;
+  for (;i-->0;customer++) {
+    switch (customer->race) {
+      case NS_race_man: manc++; break;
+      case NS_race_rabbit: rabbitc++; break;
+      case NS_race_octopus: octopusc++; break;
+      case NS_race_werewolf: werewolfc++; break;
+      case NS_race_princess: manc++; break;
+    }
+  }
+  // The majority race rule is not exclusive, ties can break for either party -- that's important.
+  int man=(manc>=rabbitc)&&(manc>=octopusc)&&(manc>=werewolfc);
+  int rabbit=(rabbitc>=manc)&&(rabbitc>=octopusc)&&(rabbitc>=werewolfc);
+  int octopus=(octopusc>=manc)&&(octopusc>=rabbitc)&&(octopusc>=werewolfc);
+  int werewolf=(werewolfc>=rabbitc)&&(werewolfc>=manc)&&(werewolfc>=octopusc);
+  if ((vegc==meatc)&&(meatc==candyc)&&man) { *severity=2; return 64; }
+  if ((vegc>meatc)&&(vegc>candyc)&&rabbit) { *severity=2; return 64; }
+  if ((candyc>vegc)&&(candyc>meatc)&&octopus) { *severity=2; return 64; }
+  if ((meatc>vegc)&&(meatc>candyc)&&werewolf) { *severity=2; return 64; }
+  if (werewolf) return 65;
+  if (rabbit) return 66;
+  if (octopus) return 67;
+  if (man) return 68;
+  
+  return 0;
+}

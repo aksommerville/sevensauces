@@ -21,6 +21,10 @@ struct layer_kitchen {
   struct widget *focus; // WEAK, tracks menu focus so we know when details are dirty.
   struct hourglass *hourglass;
   struct bobbler *bobbler;
+  int lilsis; // (0,1,2,3)=(idle,alarm,approve,assist)
+  int advice_texid;
+  int advice_w,advice_h;
+  double advice_clock;
 };
 
 #define LAYER ((struct layer_kitchen*)layer)
@@ -31,6 +35,7 @@ struct layer_kitchen {
 static void _kitchen_del(struct layer *layer) {
   menu_del(LAYER->menu);
   if (LAYER->details_texid) egg_texture_del(LAYER->details_texid);
+  if (LAYER->advice_texid) egg_texture_del(LAYER->advice_texid);
   hourglass_del(LAYER->hourglass);
   bobbler_del(LAYER->bobbler);
 }
@@ -53,6 +58,19 @@ static void kitchen_on_ready(struct layer *layer) {
  
 static void kitchen_on_advice(struct layer *layer) {
   fprintf(stderr,"%s\n",__func__);//TODO
+  if (LAYER->lilsis) {
+    if (LAYER->advice_clock>1.0) LAYER->advice_clock=1.0;
+    return;
+  }
+  int strix=kitchen_assess(&LAYER->lilsis,g.kitchen);
+  if (!strix) {
+    LAYER->lilsis=0;
+    return;
+  }
+  if (LAYER->advice_texid>0) egg_texture_del(LAYER->advice_texid);
+  LAYER->advice_texid=font_texres_multiline(g.font7,RID_strings_ui,strix,108,22,0x000000ff);
+  egg_texture_get_status(&LAYER->advice_w,&LAYER->advice_h,LAYER->advice_texid);
+  LAYER->advice_clock=5.0;
 }
 
 /* Menu callbacks.
@@ -139,6 +157,12 @@ static void _kitchen_update(struct layer *layer,double elapsed) {
 
   g.kitchen->clock+=elapsed;
   g.session->kitchentime+=elapsed;
+  
+  if (LAYER->lilsis) {
+    if ((LAYER->advice_clock-=elapsed)<=0.0) {
+      LAYER->lilsis=0;
+    }
+  }
 
   menu_update(LAYER->menu,elapsed);
   
@@ -338,16 +362,18 @@ static void _kitchen_render(struct layer *layer) {
    */
   int texid=texcache_get_image(&g.texcache,RID_image_kitchen_bg);
   graf_draw_decal(&g.graf,texid,0,0,0,0,FBW,FBH,0);
-  graf_flush(&g.graf);//XXX We shouldn't have to flush here but bg was getting evicted prematurely. That needs to be fixed in Egg, and the graf/texcache API is going to change a little.
   texid=texcache_get_image(&g.texcache,RID_image_kitchen_bits);
   
   /* Little Sister sits near the left edge of the cauldron.
+   * Draw the bobbler's surface first; she overlaps it just a little.
    */
-  //TODO
+  int srcx=145+16*LAYER->lilsis;
+  bobbler_render_surface(4,49,LAYER->bobbler);
+  graf_draw_decal(&g.graf,texid,32,30,srcx,45,15,23,0);
   
   /* Bubbles and bobbing items floating in the stew.
    */
-  bobbler_render(4,49,LAYER->bobbler);
+  bobbler_render_overlay(4,49,LAYER->bobbler);
   
   /* Highlighted item details, right side.
    */
@@ -371,7 +397,15 @@ static void _kitchen_render(struct layer *layer) {
   
   /* Word bubble, if Little Sister is talking.
    */
-  //TODO
+  if (LAYER->lilsis) {
+    if (LAYER->advice_clock<1.0) {
+      int alpha=(int)(LAYER->advice_clock*255.0);
+      graf_set_alpha(&g.graf,alpha);
+    }
+    graf_draw_decal(&g.graf,texid,37,4,1,1,114,31,0);
+    graf_draw_decal(&g.graf,LAYER->advice_texid,40,6,0,0,LAYER->advice_w,LAYER->advice_h,0);
+    graf_set_alpha(&g.graf,0xff);
+  }
   
   /* Customers.
    */

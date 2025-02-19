@@ -26,6 +26,9 @@ int egg_client_init() {
   
   if (!(g.font6=font_new())) return -1;
   if (font_add_image_resource(g.font6,0x0020,RID_image_font6_0020)<0) return -1;
+  
+  if (!(g.font7=font_new())) return -1;
+  if (font_add_image_resource(g.font7,0x0020,RID_image_font7_0020)<0) return -1;
   //TODO We'll also need Latin-1 and Cyrillic for both fonts. And whatever else we can translate to... Japanese? Telugu?
   
   srand_auto();

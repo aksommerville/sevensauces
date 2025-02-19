@@ -287,7 +287,7 @@ static void bobbler_extra_anti_gravity(struct bobbler *bobbler) {
 /* Render.
  */
  
-void bobbler_render(int dstx,int dsty,struct bobbler *bobbler) {
+void bobbler_render_surface(int dstx,int dsty,struct bobbler *bobbler) {
   if (!bobbler) return;
   
   /* Base color.
@@ -312,6 +312,10 @@ void bobbler_render(int dstx,int dsty,struct bobbler *bobbler) {
     }
   }
   graf_set_tint(&g.graf,0);
+}
+
+void bobbler_render_overlay(int dstx,int dsty,struct bobbler *bobbler) {
+  if (!bobbler) return;
   
   /* Update ingredients.
    * Or if there's none, we can terminate here.
@@ -323,7 +327,7 @@ void bobbler_render(int dstx,int dsty,struct bobbler *bobbler) {
   
   /* Render ingredients.
    */
-  texid=texcache_get_image(&g.texcache,RID_image_item);
+  int texid=texcache_get_image(&g.texcache,RID_image_item),i;
   struct ingredient *ingredient=bobbler->ingredientv;
   for (i=bobbler->ingredientc;i-->0;ingredient++) {
     double bobbley=sin(ingredient->bobblet)*2.0;

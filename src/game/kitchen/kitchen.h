@@ -43,6 +43,12 @@ int kitchen_requires_approval(const struct kitchen *kitchen);
 #define KITCHEN_APPROVAL_POISON   2 /* Poisonous. */
 #define KITCHEN_APPROVAL_PRECIOUS 3 /* Contains tools you probably don't want to lose, eg shovel. */
 
+/* Generate canned advice.
+ * Returns an index in strings:ui.
+ * (*severity) we set to (1,2,3)=(alarm,approve,assist).
+ */
+int kitchen_assess(int *severity,const struct kitchen *kitchen);
+
 /* Populate (stew) from (kitchen) and the global session.
  * This is strictly read-only. We tell you everything about state that is going to change, but don't do any of it yet.
  * The EOD layer should begin by cooking, and use this stew to pay out its reporting of the day's outcome.
@@ -85,6 +91,7 @@ void hourglass_render(int dstx,int dsty,struct hourglass *hg,double t,double rem
 struct bobbler;
 void bobbler_del(struct bobbler *bobbler);
 struct bobbler *bobbler_new();
-void bobbler_render(int dstx,int dsty,struct bobbler *bobbler);
+void bobbler_render_surface(int dstx,int dsty,struct bobbler *bobbler);
+void bobbler_render_overlay(int dstx,int dsty,struct bobbler *bobbler);
 
 #endif

@@ -24,6 +24,7 @@ extern struct g {
   struct texcache texcache;
   struct font *font;
   struct font *font6;
+  struct font *font7;
   struct layer **layerv;
   int layerc,layera;
   struct layer *layer_focus; // OPTIONAL, WEAK.

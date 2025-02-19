@@ -7,7 +7,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - [ ] Talking NPCs.
 - [ ] Condensery
 - [x] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
-- [ ] Kitchen: Advice.
+- [x] Kitchen: Advice.
 - [ ] Kitchen: Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
 - [x] Kitchen: Make hourglass blink when there's a second or two remaining.
 - [ ] Should we give Dot some of her Full Moon toys too?
