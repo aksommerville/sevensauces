@@ -6,10 +6,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 
 - [ ] Talking NPCs.
 - [ ] Condensery
-- [x] Kitchen: Decorative stew content: Show the selected items bobbing and drifting. And random bubbles, etc.
-- [x] Kitchen: Advice.
 - [ ] Kitchen: Require confirmation at Ready for obviously incorrect stews. Eg no ingredients, or poison included.
-- [x] Kitchen: Make hourglass blink when there's a second or two remaining.
 - [ ] Should we give Dot some of her Full Moon toys too?
 - - [ ] Broom. Would be for fast travel (not much need) or an alternative way to cross water. Need to ensure watery world edges behave sane.
 - - [ ] Wand: Shoots a beam that transforms any faun or item it touches. We can make a large set of items only reachable this way.
@@ -19,8 +16,8 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Compass? I'm not sure there's any point.
 - - NO: Chalk, Violin, Hat, Feather, Pitcher, Matches
 - - ALREADY DONE: Shovel, Seeds, Cheese, Gold
-- [ ] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
-- [ ] Release grapple over water. What should happen? What we have is not ok.
+- [x] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
+- [x] Release grapple over water. What should happen? What we have is not ok.
 - [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
 - - It would be cool if you can catch a sea monster. Like, a giant squid that takes up half the screen.
 - [ ] Fishing challenges:
@@ -32,16 +29,10 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
 - [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
 - [ ] EOD: Show money earned (and move that into stew).
-- [x] Teleport shop in the village: 4 remote points but you have to reach them first. Once all 4 opened, you get daily income from the shop.
-- - I think we don't need this -- the world is very small.
 - [ ] Door transitions
-- [x] Assistance near home:
-- - Reveal the Daily Special.
-- - Tell composition of tonight's party.
-- - Recommend a recipe.
-- [x] Beef up the bow a little. As is, the grapple is actually a much better hunting weapon.
 - [ ] Eliminate the bespoke string formatting, replace with `strings_format()`
 - [ ] Make an abbreviated option, say 3 days? 20-25 minutes/session will be a bit much for cons.
+- [ ] Day song should be longer and night song should be shorter. (ay yi yi, it's a 2-minute epic, but kitchen sessions only last 20 seconds or so).
 
 ## Notes re starting over
 

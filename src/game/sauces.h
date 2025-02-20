@@ -64,4 +64,8 @@ extern const uint32_t sauces_item_description_colorv[10];
  */
 int sauces_generate_recipe(char *dst,int dsta);
 
+/* Generate a decorative sprite and sound effect.
+ */
+void sauces_splash(double x,double y);
+
 #endif

@@ -432,6 +432,23 @@ static void _faun_paralyze(struct sprite *sprite,struct sprite *controller) {
   SPRITE->paralyzer=controller;
 }
 
+/* Render.
+ */
+ 
+static void _faun_render(struct sprite *sprite,int16_t x,int16_t y) {
+  if (SPRITE->capture_clock>0.0) {
+    double period=SPRITE->capture_time*0.5;
+    uint32_t tint;
+    if (SPRITE->capture_clock>=period) tint=0xffff0000|(int)(((SPRITE->capture_clock-period)*255.0)/period);
+    else tint=0xff000000|(int)((SPRITE->capture_clock*255.0)/period);
+    graf_set_tint(&g.graf,tint);
+    graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,sprite->imageid),x,y,sprite->tileid,sprite->xform);
+    graf_set_tint(&g.graf,0);
+  } else {
+    graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,sprite->imageid),x,y,sprite->tileid,sprite->xform);
+  }
+}
+
 /* Type definition.
  */
  
@@ -441,4 +458,5 @@ const struct sprite_type sprite_type_faun={
   .init=_faun_init,
   .update=_faun_update,
   .paralyze=_faun_paralyze,
+  .render=_faun_render,
 };

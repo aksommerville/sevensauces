@@ -100,13 +100,8 @@ static void _arrow_update(struct sprite *sprite,double elapsed) {
     SPRITE->el=0.0;
     if (SPRITE->del<0.0) { // bounce
       if (arrow_on_water(sprite)) {
-        egg_play_sound(RID_sound_splash);
+        sauces_splash(sprite->x,sprite->y);
         sprite_kill_soon(sprite);
-        struct sprite *splash=sprite_new(&sprite_type_animonce,sprite->owner,sprite->x,sprite->y,3,0);
-        if (splash) {
-          splash->imageid=RID_image_sprites1;
-          splash->tileid=0x4d;
-        }
       } else {
         egg_play_sound(RID_sound_bump);
         SPRITE->del*=-0.5;

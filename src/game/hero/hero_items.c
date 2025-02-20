@@ -84,6 +84,8 @@ static void hero_begin_grapple(struct sprite *sprite) {
   sprite_grapple_setup(grapple,SPRITE->facedx,SPRITE->facedy);
   SPRITE->item_in_use=NS_item_grapple;
   SPRITE->walkdx=SPRITE->walkdy=0;
+  SPRITE->safex=sprite->x;
+  SPRITE->safey=sprite->y;
   egg_play_sound(RID_sound_grapple_start);
 }
 
@@ -91,7 +93,19 @@ static void hero_end_grapple(struct sprite *sprite) {
   sprite_grapple_drop_all(sprite->owner);
   SPRITE->item_in_use=0;
   hero_rejoin_motion(sprite);
-  //TODO If we ended up over water, should we drown? As is, we will pop out to a safe place.
+  
+  // If we land in water, splash and warp to where we started.
+  int col=(int)sprite->x,row=(int)sprite->y;
+  if ((col>=0)&&(row>=0)&&(col<g.world->map->w)&&(row<g.world->map->h)) {
+    uint8_t tileid=g.world->map->v[row*g.world->map->w+col];
+    uint8_t physics=g.world->map->physics[tileid];
+    if (physics==NS_physics_water) {
+      sauces_splash(sprite->x,sprite->y);
+      sprite->x=SPRITE->safex;
+      sprite->y=SPRITE->safey;
+    }
+  }
+
   sprite_rectify_physics(sprite,0.5); // We don't check physics while grappling.
 }
 
@@ -108,6 +122,18 @@ void sprite_hero_engage_grapple(struct sprite *sprite) {
 
 void sprite_hero_release_grapple(struct sprite *sprite) {
   sprite_rectify_physics(sprite,0.5); // We don't check physics while grappling.
+  
+  // If we land in water, splash and warp to where we started.
+  int col=(int)sprite->x,row=(int)sprite->y;
+  if ((col>=0)&&(row>=0)&&(col<g.world->map->w)&&(row<g.world->map->h)) {
+    uint8_t tileid=g.world->map->v[row*g.world->map->w+col];
+    uint8_t physics=g.world->map->physics[tileid];
+    if (physics==NS_physics_water) {
+      sauces_splash(sprite->x,sprite->y);
+      sprite->x=SPRITE->safex;
+      sprite->y=SPRITE->safey;
+    }
+  }
 }
 
 /* Fishpole.

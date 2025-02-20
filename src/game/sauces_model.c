@@ -7,6 +7,7 @@
 #include "game/world/world.h"
 #include "game/kitchen/kitchen.h"
 #include "game/layer/layer.h"
+#include "game/sprite/sprite.h"
 
 /* Layer filter: Only those we can keep when dropping the session.
  * Might only be hello.
@@ -574,4 +575,18 @@ int sauces_generate_recipe(char *dst,int dsta) {
   if (dstc>dsta-srcc) return 0;
   memcpy(dst+dstc,src,srcc); dstc+=srcc;
   return dstc;
+}
+
+/* Splash.
+ */
+
+void sauces_splash(double x,double y) {
+  egg_play_sound(RID_sound_splash);
+  if (g.world) {
+    struct sprite *splash=sprite_new(&sprite_type_animonce,g.world->sprites,x,y,3,0);
+    if (splash) {
+      splash->imageid=RID_image_sprites1;
+      splash->tileid=0x4d;
+    }
+  }
 }

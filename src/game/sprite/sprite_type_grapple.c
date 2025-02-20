@@ -91,7 +91,20 @@ static void _grapple_update(struct sprite *sprite,double elapsed) {
       } break;
       
     case GRAPPLE_PHASE_RETURN: {
-        if (!sprite_is_resident(sprite->owner,SPRITE->pumpkin)) SPRITE->pumpkin=0;
+        if (!sprite_is_resident(sprite->owner,SPRITE->pumpkin)) {
+          if (SPRITE->pumpkin&&(SPRITE->pumpkin->type!=&sprite_type_hero)) {
+            int col=(int)SPRITE->pumpkin->x,row=(int)SPRITE->pumpkin->y;
+            if ((col>=0)&&(row>=0)&&(col<g.world->map->w)&&(row<g.world->map->h)) {
+              uint8_t tileid=g.world->map->v[row*g.world->map->w+col];
+              uint8_t physics=g.world->map->physics[tileid];
+              if (physics==NS_physics_water) {
+                sauces_splash(SPRITE->pumpkin->x,SPRITE->pumpkin->y);
+                sprite_kill_soon(SPRITE->pumpkin);
+              }
+            }
+          }
+          SPRITE->pumpkin=0;
+        }
         if (!SPRITE->pumpkin) { sprite_kill_soon(sprite); return; }
         double dx=SPRITE->dx*elapsed*GRAPPLE_RETURN_SPEED;
         double dy=SPRITE->dy*elapsed*GRAPPLE_RETURN_SPEED;
@@ -189,8 +202,22 @@ void sprite_grapple_drop_all(struct sprites *sprites) {
   for (;c-->0;p++) {
     struct sprite *sprite=*p;
     if (sprite->type!=&sprite_type_grapple) continue;
-    if (SPRITE->pumpkin&&sprite_is_resident(sprite->owner,SPRITE->pumpkin)&&SPRITE->pumpkin->type->paralyze) {
-      SPRITE->pumpkin->type->paralyze(SPRITE->pumpkin,0);
+    if (SPRITE->pumpkin&&sprite_is_resident(sprite->owner,SPRITE->pumpkin)) {
+      if (SPRITE->pumpkin->type->paralyze) {
+        SPRITE->pumpkin->type->paralyze(SPRITE->pumpkin,0);
+      }
+      if (SPRITE->pumpkin->type!=&sprite_type_hero) {
+        int col=(int)SPRITE->pumpkin->x,row=(int)SPRITE->pumpkin->y;
+        if ((col>=0)&&(row>=0)&&(col<g.world->map->w)&&(row<g.world->map->h)) {
+          uint8_t tileid=g.world->map->v[row*g.world->map->w+col];
+          uint8_t physics=g.world->map->physics[tileid];
+          if (physics==NS_physics_water) {
+            sauces_splash(SPRITE->pumpkin->x,SPRITE->pumpkin->y);
+            sprite_kill_soon(SPRITE->pumpkin);
+            SPRITE->pumpkin=0;
+          }
+        }
+      }
     }
     sprite_kill_soon(sprite);
   }
