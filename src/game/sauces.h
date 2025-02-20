@@ -51,8 +51,6 @@ int sauces_end_night();
 
 void sauces_dialogue(int dialogueid);
 
-int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid);
-
 /* Generate the long text description for pause menu and kitchen, optionally with color.
  * The default colors assume a dark background.
  */

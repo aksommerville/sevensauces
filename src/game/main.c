@@ -103,25 +103,3 @@ int sauces_res_get(void *dstpp,int tid,int rid) {
   }
   return 0;
 }
-
-/* Format string, replacing '%' with an item name.
- */
-
-int sauces_format_item_string(char *dst,int dsta,int fmt_rid,int fmt_ix,uint8_t itemid) {
-  const char *name=0,*fmt=0;
-  int namec,fmtc;
-  if ((namec=strings_get(&name,RID_strings_item_name,itemid))<1) return 0;
-  if ((fmtc=strings_get(&fmt,fmt_rid,fmt_ix))<1) return 0;
-  int dstc=0;
-  for (;fmtc-->0;fmt++) {
-    if (*fmt=='%') {
-      if (dstc>dsta-namec) return 0;
-      memcpy(dst+dstc,name,namec);
-      dstc+=namec;
-    } else {
-      if (dstc>=dsta) return 0;
-      dst[dstc++]=*fmt;
-    }
-  }
-  return dstc;
-}

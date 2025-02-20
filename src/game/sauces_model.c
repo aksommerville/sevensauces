@@ -62,9 +62,8 @@ int sauces_end_day() {
     if (!(g.kitchen=kitchen_new())) return -1;
     if (!layer_spawn(&layer_type_kitchen)) return -1;
   } else {
-    //TODO game over
-    fprintf(stderr,"*** eod game over ***\n");
-    sauces_end_session();
+    // gameover case 1: No customers at EOD (eg you lost them all the night before, and didn't apologize to any.
+    if (!layer_spawn(&layer_type_gameover)) return -1;
   }
   return 0;
 }
@@ -81,16 +80,14 @@ int sauces_end_night() {
   if (session_may_proceed(g.session)) {
     g.session->day++;
     if (g.session->day>=7) {
-      fprintf(stderr,"*** end of week *** igc=%.03f\n",g.session->worldtime+g.session->kitchentime);//TODO wrap-up layer
-      fprintf(stderr,"Customers: %d\n",
-        g.session->customerc+g.session->custover[0]+g.session->custover[1]+g.session->custover[2]+g.session->custover[3]
-      );
+      // gameover case 2: End of Sunday. Victory! Unless you didn't feed them just now...
+      if (!layer_spawn(&layer_type_gameover)) return -1;
     } else {
       if (!layer_spawn(&layer_type_beginday)) return -1;
     }
   } else {
-    fprintf(stderr,"*** mid-week game over *** igc=%.03f\n",g.session->worldtime+g.session->kitchentime);//TODO
-    sauces_end_session();
+    // gameover case 3: No customers or losses at the end of the night, eg you poisoned them.
+    if (!layer_spawn(&layer_type_gameover)) return -1;
   }
   return 0;
 }

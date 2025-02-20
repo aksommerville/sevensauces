@@ -278,8 +278,9 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
       if (g.world) {
         struct sprite *hero=sprites_get_hero(g.world->sprites);
         if (hero) {
+          struct strings_insertion ins={'r',.r={.rid=RID_strings_item_name,.ix=itemid}};
           char msg[64];
-          int msgc=sauces_format_item_string(msg,sizeof(msg),RID_strings_ui,13,itemid);
+          int msgc=strings_format(msg,sizeof(msg),RID_strings_ui,13,&ins,1);
           if ((msgc>0)&&(msgc<=sizeof(msg))) {
             struct layer *toast=layer_spawn(&layer_type_toast);
             layer_toast_setup_world(toast,hero->x,hero->y,msg,msgc,0xffffffff);
@@ -292,8 +293,9 @@ int session_acquire_item(struct session *session,uint8_t itemid,void (*cb)(int i
   } else if (cb) {
     struct layer *pause=layer_spawn(&layer_type_pause);
     if (!pause) return -1;
+    struct strings_insertion ins={'r',.r={.rid=RID_strings_item_name,.ix=itemid}};
     char msg[64];
-    int msgc=sauces_format_item_string(msg,sizeof(msg),RID_strings_ui,17,itemid);
+    int msgc=strings_format(msg,sizeof(msg),RID_strings_ui,17,&ins,1);
     const char *cancel=0;
     int cancelc=strings_get(&cancel,RID_strings_ui,18);
     if (layer_pause_setup_query(pause,msg,msgc,cancel,cancelc,cb,userdata)<0) return -1;

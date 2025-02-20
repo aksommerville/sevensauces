@@ -89,6 +89,7 @@ extern const struct layer_type layer_type_status;
 extern const struct layer_type layer_type_fishing;
 extern const struct layer_type layer_type_shop;
 extern const struct layer_type layer_type_condensery;
+extern const struct layer_type layer_type_gameover;
 
 /* "global" is the regular pause menu. It can change the session's chosen slot, and can abort the session.
  * "query" takes an optional prompt and reports the chosen item to your callback, or <0 if cancelled.

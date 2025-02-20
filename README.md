@@ -16,8 +16,6 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Compass? I'm not sure there's any point.
 - - NO: Chalk, Violin, Hat, Feather, Pitcher, Matches
 - - ALREADY DONE: Shovel, Seeds, Cheese, Gold
-- [x] Picking up fauna is not obvious. Need some indication immediately when the clock starts ticking.
-- [x] Release grapple over water. What should happen? What we have is not ok.
 - [ ] Fishing odds varying geographically. And maybe different kinds of fish? And maybe you can fish one spot out?
 - - It would be cool if you can catch a sea monster. Like, a giant squid that takes up half the screen.
 - [ ] Fishing challenges:
@@ -25,14 +23,32 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 - - [ ] Machine gun
 - - [ ] Spell of darkness
 - - [ ] Cat
-- [ ] An eighth bonus quest: Rescue the Princess. No sauce for winning, but the Princess will show up as a customer.
-- - That way, we have a max of 23 instead of 22 -- exactly the capacity we can render.
+- - [ ] Decoy fish
 - [ ] Review shop prices. I just made up numbers off the cuff, no logic behind them.
+- [ ] Make higher-value candy available. Sell applepie at the candy shop?
 - [ ] EOD: Show money earned (and move that into stew).
+- [ ] EOD: Show the stew, split out by food group.
 - [ ] Door transitions
-- [ ] Eliminate the bespoke string formatting, replace with `strings_format()`
+- [x] Eliminate the bespoke string formatting, replace with `strings_format()`
 - [ ] Make an abbreviated option, say 3 days? 20-25 minutes/session will be a bit much for cons.
 - [ ] Day song should be longer and night song should be shorter. (ay yi yi, it's a 2-minute epic, but kitchen sessions only last 20 seconds or so).
+- [ ] Challenge regions
+- - [ ] Barracks
+- - [ ] Castle. Find the runaway cow.
+- - [ ] Swamp
+- - [ ] Crypt
+- - [ ] Beach
+- - [ ] Desert. Boss fight against the Sand Witch.
+- - [ ] Mine. Fetch quest for gems. He wants say 12 of them, and all at once, so you might have to drop inventory.
+- - [ ] Dragon's Lair. Boss fight. No sauce, instead you get the Princess as a customer.
+- [ ] Odd jobs, side quests, jokes.
+- - [ ] Deliver 2 love letters to anyone, and the next day they get married and you can steal the cake.
+- - [ ] Count the livestock.
+- - [ ] Eliminate the clutter. Bunch of items you have to pick up and drop at the dump.
+- - [ ] Mow the lawn. Sword.
+- - [ ] Catch the rats.
+- - [ ] Carry a bomb from the lab in the Village, to the job site in the Mine. Timed, and you can only make it on a broom.
+- - [ ] Dropped precious thing in the pond. Use fishpole or grapple to retrieve it.
 
 ## Notes re starting over
 
